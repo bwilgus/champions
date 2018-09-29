@@ -1,0 +1,116 @@
+from requests import get
+from requests.exceptions import RequestException
+from contextlib import closing
+from bs4 import BeautifulSoup
+
+#Script that saves website as PDF
+#https://stackoverflow.com/questions/23359083/how-to-convert-webpage-into-pdf-by-using-python
+
+##############################################################################################
+
+#Excel Scripts
+
+gameURL = 'https://www.google.com'
+passTitle = [['Name','Team','Opp','Comp','Att','Yds','TD','INT']]
+passAdd = []
+passStats = []
+
+rushTitle = [['Name','Team','Opp','Att','Yds','20+','Long','TD']]
+rushAdd = []
+rushStats = []
+
+rectTitle = [['Name','Team','Opp','Rec','Yds','20+','40+','Long','TD']]
+recAdd = []
+recStats = []
+
+defTitle = [['Name','Team','Opp','Sacks','INT']]
+defAdd = []
+defStats = []
+
+fgTitle = [['Name','Team','Opp','Made','Missed']]
+fgAdd = []
+fgStats = []
+
+##Washington @ Utah 4OT game
+#Use for testing and requirements gathering
+#'https://www.whatifsports.com/ncaafb/boxscore.asp?gameid=9916648&nomenu=1&ad=0'
+
+
+
+
+###############################################################################################
+
+#BeautifulSoup functions
+def simple_get(url):
+    """
+    Attempts to get the content at `url` by making an HTTP GET request.
+    If the content-type of response is some kind of HTML/XML, return the
+    text content, otherwise return None.
+    """
+    try:
+        with closing(get(url, stream=True)) as resp:
+            if is_good_response(resp):
+                return resp.content
+            else:
+                return None
+
+    except RequestException as e:
+        log_error('Error during requests to {0} : {1}'.format(url, str(e)))
+        return None
+
+def is_good_response(resp):
+    """
+    Returns True if the response seems to be HTML, False otherwise.
+    """
+    content_type = resp.headers['Content-Type'].lower()
+    return (resp.status_code == 200 
+            and content_type is not None 
+            and content_type.find('html') > -1)
+
+
+def log_error(e):
+    """
+    It is always a good idea to log errors. 
+    This function just prints them, but you can
+    make it do anything.
+    """
+    print(e)
+
+    
+
+
+
+
+
+###############################################################################################
+
+    #My Functions
+
+def gameLog(q):
+    gameID = str(gameURL[(gameURL.find('gameid=')+7):gameURL.find('&nomenu')])
+    pbpURL = 'https://www.whatifsports.com/ncaafb/pbp.asp?gameid=' + gameID + '&qtr=' + str(q)
+    return pbpURL
+
+def bSoup(U):
+    global gameURL
+    global q1, q2, q3, q4
+    global raw_html, soup
+    gameURL = U
+    q1 = gameLog(1)
+    q2 = gameLog(2)
+    q3 = gameLog(3)
+    q4 = gameLog(4)
+    raw_html = simple_get(U)
+    soup = BeautifulSoup(raw_html, 'html.parser')
+
+
+
+
+
+
+
+################################################################################################
+
+def handyScript():
+    #finds the first table, could help flip through all tables
+    lt = soup.find('table')
