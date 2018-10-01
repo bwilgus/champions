@@ -114,3 +114,146 @@ def bSoup(U):
 def handyScript():
     #finds the first table, could help flip through all tables
     lt = soup.find('table')
+
+################################################################################################
+
+#WhatIf info
+
+##Away team id = "vname"
+##Away team year = 'vseason
+##Away Submit Button id = 'visitorbtn'
+
+##Home team id = 'hname'
+##Home team year = 'hseason'
+##Home Submit Button id = 'homebtn'
+
+
+
+teamDic = {'Air Force':1998
+            ,'Akron':2015
+            ,'Alabama':2016
+            ,'Appalachian State':2016
+            ,'Arizona':1998
+            ,'Arizona State':1996
+            ,'Arkansas':2010
+            ,'Arkansas State':2012
+            ,'Army':1996
+            ,'Auburn':2010
+            ,'Ball State':2008
+            ,'Baylor':2013
+            ,'Boise State':2010
+            ,'Boston College':2007
+            ,'Bowling Green':2015
+            ,'Buffalo':2008
+            ,'BYU':2006
+            ,'California':2004
+            ,'Central Michigan':2009
+            ,'Charlotte':2016
+            ,'Cincinnati':2009
+            ,'Clemson':2017
+            ,'Colorado':1996
+            ,'Colorado State':1997
+            ,'Duke':2013
+            ,'East Carolina':1996
+            ,'Eastern Michigan':2016
+            ,'FIU':2011
+            ,'Florida':2008
+            ,'Florida Atlantic':2007
+            ,'Florida State':1999
+            ,'Fresno State':2001
+            ,'Georgia':2014
+            ,'Georgia Southern':2015
+            ,'Georgia State':2015
+            ,'Georgia Tech':2014
+            ,'Hawaii':2006
+            ,'Houston':2015
+            ,'Idaho':2016
+            ,'Illinois':2001
+            ,'Indiana':2013
+            ,'Iowa':2002
+            ,'Iowa State':2005
+            ,'Kansas':2007
+            ,'Kansas State':1998
+            ,'Kent State':2012
+            ,'Kentucky':2007
+            ,'Louisiana Tech':2012
+            ,'Louisiana-Monroe':2012
+            ,'Louisville':2006
+            ,'LSU':2011
+            ,'Marshall':2014
+            ,'Maryland':2003
+            ,'Massachusetts':2015
+            ,'Memphis':2014
+            ,'Miami (FL)':2001
+            ,'Miami (OH)':2003
+            ,'Michigan':1997
+            ,'Michigan State':2014
+            ,'Middle Tennessee':2009
+            ,'Minnesota':2003
+            ,'Mississippi State':2014
+            ,'Missouri':2013
+            ,'Navy':2015
+            ,'NC State':2002
+            ,'Nebraska':1997
+            ,'Nevada':2010
+            ,'New Mexico':2003
+            ,'New Mexico State':2002
+            ,'NIU':2011
+            ,'North Carolina':1997
+            ,'North Texas':2013
+            ,'Northwestern':2005
+            ,'Notre Dame':2005
+            ,'Ohio':2005
+            ,'Ohio State':1998
+            ,'Oklahoma':2008
+            ,'Oklahoma State':2011
+            ,'Old Dominion':2016
+            ,'Ole Miss':2014
+            ,'Oregon':2014
+            ,'Oregon State':2000
+            ,'Penn State':2005
+            ,'Pittsburgh':2009
+            ,'Purdue':1998
+            ,'Rice':2008
+            ,'Rutgers':2006
+            ,'San Diego State':2016
+            ,'San Jose State':2012
+            ,'SMU':2012
+            ,'South Alabama':2013
+            ,'South Carolina':2013
+            ,'South Florida':2007
+            ,'Southern California':2004
+            ,'Southern Miss':1999
+            ,'Stanford':2010
+            ,'Syracuse':1996
+            ,'Temple':2016
+            ,'Tennessee':1997
+            ,'Texas':2005
+            ,'Texas A&M':2012
+            ,'Texas Christian':2014
+            ,'Texas State':2014
+            ,'Texas Tech':2008
+            ,'Toledo':2015
+            ,'Troy':2007
+            ,'Tulane':1998
+            ,'Tulsa':2008
+            ,'UCF':2013
+            ,'UCLA':1997
+            ,'Uconn':2009
+            ,'UL Lafayette':2012
+            ,'UNLV':2000
+            ,'Utah':2004
+            ,'Utah State':2012
+            ,'UTEP':2008
+            ,'UTSA':2013
+            ,'Vanderbilt':2012
+            ,'Virginia':2004
+            ,'Virginia Tech':2000
+            ,'Wake Forest':2006
+            ,'Washington':2016
+            ,'Washington State':1997
+            ,'West Virginia':2007
+            ,'Western Kentucky':2015
+            ,'Western Michigan':2016
+            ,'Wisconsin':1998
+            ,'Wyoming':1996}
