@@ -35,6 +35,10 @@ fgStats = []
 #Use for testing and requirements gathering
 #'https://www.whatifsports.com/ncaafb/boxscore.asp?gameid=9916648&nomenu=1&ad=0'
 
+##Locker
+#Holds all saved games
+#https://www.whatifsports.com/locker/saved_games.asp?view=1
+
 
 
 
