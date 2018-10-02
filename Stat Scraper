@@ -1,0 +1,40 @@
+from requests import get
+from requests.exceptions import RequestException
+from bs4 import BeautifulSoup
+import xlrd
+import os
+
+#Excel Scripts
+#This will need a library that writes to excel
+
+gameURL = 'https://www.google.com'
+passTitle = [['Name','Team','Opp','Comp','Att','Yds','TD','INT']]
+passAdd = []
+passStats = []
+
+rushTitle = [['Name','Team','Opp','Att','Yds','20+','Long','TD']]
+rushAdd = []
+rushStats = []
+
+rectTitle = [['Name','Team','Opp','Rec','Yds','20+','40+','Long','TD']]
+recAdd = []
+recStats = []
+
+defTitle = [['Name','Team','Opp','Sacks','INT']]
+defAdd = []
+defStats = []
+
+fgTitle = [['Name','Team','Opp','Made','Missed']]
+fgAdd = []
+fgStats = []
+
+find = []
+
+##Washington @ Utah 4OT game
+#Use for testing and requirements gathering
+#'https://www.whatifsports.com/ncaafb/boxscore.asp?gameid=9916648&nomenu=1&ad=0'
+
+
+
+
+###############################################################################################
