@@ -1,0 +1,50 @@
+import pdfkit
+import xlrd
+import openpyxl
+from openpyxl import Workbook
+
+error = "These Game IDs did not download PDFs: "
+
+wb = Workbook(r'C:\users\wilgu\desktop\champions.xlsx')
+pc = ""
+find = []
+gameURL = ""
+gameID = ""
+week = ""
+
+#Sets up the PDF saving
+path_wkthmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
+config = pdfkit.configuration(wkhtmltopdf=path_wkthmltopdf)
+
+wbLink = r'C:\users\wilgu\Desktop\champions.xlsx'
+wkbk = xlrd.open_workbook(wbLink)
+
+sheet = wkbk.sheet_by_name('Data')
+
+for i in range(len(sheet.row(0))):
+   find.append(sheet.cell(0, i).value)
+
+pc = find.index('PDF?')
+destPath = r'C:\users\wilgu\Desktop\blog\Season of Champions\Box Scores'
+uc = find.index('Box Score URL')    
+gID = find.index('Game ID')
+week = find.index('Week')
+
+def gameID(q):
+    gameURL = str(q[(q.find('gameid=')+7):q.find('&nomenu')])
+    return gameURL
+
+def gamePDF():
+    num = 781
+    for i in range(1,num):
+        thisURL = sheet.cell(i, uc).value
+        wk = int(sheet.cell(i, week).value)
+        if wk <= 10:
+            wk = "Week 0" + str(wk)
+        else:
+            wk = "Week " + str(wk)
+        sheet.cell(i, pc).value = 'X'
+
+        Try: pdfkit.from_url(thisURL,destPath + r'\\' + str(wk) + r'\\' + sheet.cell(i, gID).value + '.pdf', configuration=config)
+        Except: error = error + sheet.cell(i, gID).value
+        
