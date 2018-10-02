@@ -4,16 +4,22 @@ html = list(soup.children)[2]
 list(html.children)
 body = list(html.children)[8]
 
-list(s.children)[1] = top box score
-  list(s.children)[3] = Gridiron Dynasty ad
-  list(s.children)[5] = Score Summary
-  list(s.children)[7] = Just the table header for 'Team Statistics'
 
-list(soup.children)[2] = Top Box Score, Scoring Summary, Table Header for "Team Statistics"
-  list(s.children)[1] = top box score
-  list(s.children)[3] = Gridiron Dynasty ad
-  list(s.children)[5] = Score Summary
-  list(s.children)[7] = Just the table header for 'Team Statistics'
+##############################################
+
+
+s = list(list(list(soup.children)[2])[3])[8]  
+  Top Box Score, Scoring Summary, Table Header for "Team Statistics"
+    list(s.children)[1] = top box score
+      Home Scores: s = list(list(list(list(list(list(soup.children)[2])[3])[8])[1])[1])[3]
+        1
+        2
+        3
+        4
+        OT#
+    list(s.children)[3] = Gridiron Dynasty ad
+    list(s.children)[5] = Score Summary
+    list(s.children)[7] = Just the table header for 'Team Statistics'
 
 list(soup.children)[3].get_text() = away team: Year, Team, Mascot
 list(soup.children)[4].get_text() = home team: Year, Team, Mascot
