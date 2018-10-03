@@ -4,25 +4,61 @@ html = list(soup.children)[2]
 list(html.children)
 body = list(html.children)[8]
 
+def washUtah():
+    bSoup('https://www.whatifsports.com/ncaafb/boxscore.asp?gameid=9916648&nomenu=1&ad=0')
+
+def boiseTroy():
+    bSoup('https://www.whatifsports.com/ncaafb/boxscore.asp?gameid=9891802&nomenu=1&ad=1')
+
+
 
 ##############################################
 
+awayTeam = list(soup.children)[3].get_text()
+homeTeam = list(soup.children)[4].get_text()
 
 s = list(list(list(soup.children)[2])[3])[8]  
   Top Box Score, Scoring Summary, Table Header for "Team Statistics"
     list(s.children)[1] = top box score
       Home Scores: s = list(list(list(list(list(list(soup.children)[2])[3])[8])[1])[1])[3]
-        1
-        2
-        3
-        4
-        OT#
+        Home Team = list(s.stripped_strings)[0]
+        Q1 = list(s.stripped_strings)[1]
+        2 = list(s.stripped_strings)[2]
+        3 = list(s.stripped_strings)[3]
+        4 = list(s.stripped_strings)[4]
+        OT# = list(s.stripped_strings)[4 + n]
+        Final = list(s.stripped_strings)[len(s.stripped_strings)]
+        
+        for i in range(len(list(s.stripped_strings))):
+	        list(s.stripped_strings)[i]
+      
+      Away Scores: s = list(list(list(list(list(list(soup.children)[2])[3])[8])[1])[1])[5]
+        Away Team = list(s.stripped_strings)[0]
+        Q1 = list(s.stripped_strings)[1]
+        2 = list(s.stripped_strings)[2]
+        3 = list(s.stripped_strings)[3]
+        4 = list(s.stripped_strings)[4]
+        OT# = list(s.stripped_strings)[4 + n]
+        Final = list(s.stripped_strings)[len(s.stripped_strings)]
+        
+        for i in range(len(list(s.stripped_strings))):
+	        list(s.stripped_strings)[i]
+      
     list(s.children)[3] = Gridiron Dynasty ad
-    list(s.children)[5] = Score Summary
+    
+    ## This will give a comma delimited list of the scoring plays
+    s = list(list(list(list(list(soup.children)[2])[3])[8])[5])[1] = Score Summary
+      list(list(s.children)[i].stripped_strings)
+      list(s.children)[1] = Wrapper
+      for i in range(len(list(s.children))):
+        try: list(list(s.children)[i].stripped_strings)
+        except:
+          continue
+        
     list(s.children)[7] = Just the table header for 'Team Statistics'
 
-list(soup.children)[3].get_text() = away team: Year, Team, Mascot
-list(soup.children)[4].get_text() = home team: Year, Team, Mascot
+list(soup.children)[3].get_text()[5:] = away team: Team, Mascot
+list(soup.children)[4].get_text()[5:] = home team: Team, Mascot
 
 list(soup.children)[6] = Team Stats, First Downs
   list(a.children)[1].get_text() = Category
