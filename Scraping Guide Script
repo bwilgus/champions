@@ -61,101 +61,95 @@ list(soup.children)[3].get_text()[5:] = away team: Team, Mascot
 list(soup.children)[4].get_text()[5:] = home team: Team, Mascot
 ##Build an error check here to ensure that the link pulled from Excel equals the data from the website
 
-list(soup.children)[6] = Team Stats, First Downs
-  list(a.children)[1].get_text() = Category
-  list(a.children)[3].get_text() = Away 
-  list(a.children)[5].get_text() = Home 
+list(list(soup.children)[6].stripped_strings)
+  list(a.children)[0].get_text() = Category
+  list(a.children)[1].get_text() = Away 
+  list(a.children)[2].get_text() = Home 
 
-list(soup.children)[8] = Team Stats, First Downs, Rushing
-  list(a.children)[1].get_text() = Category
-  list(a.children)[3].get_text() = Away 
-  list(a.children)[5].get_text() = Home 
+list(list(soup.children)[6].stripped_strings) = Team Stats, First Downs, Rushing
+  list(a.children)[0].get_text() = Category
+  list(a.children)[1].get_text() = Away 
+  list(a.children)[2].get_text() = Home 
 
-list(soup.children)[10] = Team Stats, First Downs, Passing
-  list(a.children)[1].get_text() = Category
-  list(a.children)[3].get_text() = Away 
-  list(a.children)[5].get_text() = Home 
+list(list(soup.children)[10].stripped_strings) = Team Stats, First Downs, Passing
+  list(a.children)[0].get_text() = Category
+  list(a.children)[1].get_text() = Away 
+  list(a.children)[2].get_text() = Home 
 
-list(soup.children)[12] = Team Stats, First Downs, Penalty
-  list(a.children)[1].get_text() = Category
-  list(a.children)[3].get_text() = Away 
-  list(a.children)[5].get_text() = Home 
+list(list(soup.children)[12].stripped_strings) = Team Stats, First Downs, Penalty
+  list(a.children)[0].get_text() = Category
+  list(a.children)[1].get_text() = Away 
+  list(a.children)[2].get_text() = Home 
 
-list(soup.children)[14] = Team Stats, Third Down Efficiency
-  list(a.children)[1].get_text() = Category
-  list(a.children)[3].get_text() = Away 
-  list(a.children)[5].get_text() = Home 
+list(list(soup.children)[14].stripped_strings) = Team Stats, Third Down Efficiency
+  list(a.children)[0].get_text() = Category
+  list(a.children)[1].get_text() = Away 
+  list(a.children)[2].get_text() = Home 
 
-list(soup.children)[16] = Team Stats, Fourth Down Efficiency
-  list(a.children)[1].get_text() = Category
-  list(a.children)[3].get_text() = Away 
-  list(a.children)[5].get_text() = Home 
+list(list(soup.children)[16].stripped_strings) = Team Stats, Fourth Down Efficiency
+  list(a.children)[0].get_text() = Category
+  list(a.children)[1].get_text() = Away 
+  list(a.children)[2].get_text() = Home 
 
-list(soup.children)[18] = Team Stats, Rushes-Yards
-  list(a.children)[1].get_text() = Category
-  list(a.children)[3].get_text() = Away 
-  list(a.children)[5].get_text() = Home 
+list(list(soup.children)[18].stripped_strings) = Team Stats, Rushes-Yards
+  list(a.children)[0].get_text() = Category
+  list(a.children)[1].get_text() = Away 
+  list(a.children)[2].get_text() = Home 
 
-list(soup.children)[20] = Team Stats, Avg Rush
-  list(a.children)[1].get_text() = Category
-  list(a.children)[3].get_text() = Away 
-  list(a.children)[5].get_text() = Home 
+list(list(soup.children)[20].stripped_strings) = Team Stats, Avg Rush
+  list(a.children)[0].get_text() = Category
+  list(a.children)[1].get_text() = Away 
+  list(a.children)[2].get_text() = Home 
 
-list(soup.children)[22] = Team Stats, Comp-Att-Int
-  list(a.children)[1].get_text() = Category
-  list(a.children)[3].get_text() = Away 
-  list(a.children)[5].get_text() = Home 
+list(list(soup.children)[22].stripped_strings) = Team Stats, Comp-Att-Int
+  list(a.children)[0].get_text() = Category
+  list(a.children)[1].get_text() = Away 
+  list(a.children)[2].get_text() = Home 
 
-list(soup.children)[24] = Team Stats, Passing Yards
-  list(a.children)[1].get_text() = Category
-  list(a.children)[3].get_text() = Away 
-  list(a.children)[5].get_text() = Home 
+list(list(soup.children)[24].stripped_strings) = Team Stats, Passing Yards
+  list(a.children)[0].get_text() = Category
+  list(a.children)[1].get_text() = Away 
+  list(a.children)[2].get_text() = Home 
 
-list(soup.children)[26] = Team Stats, Sacks-Yards
-  list(a.children)[1].get_text() = Category
-  list(a.children)[3].get_text() = Away 
-  list(a.children)[5].get_text() = Home 
+list(list(soup.children)[26].stripped_strings) = Team Stats, Sacks-Yards
+  list(a.children)[0].get_text() = Category
+  list(a.children)[1].get_text() = Away 
+  list(a.children)[2].get_text() = Home 
 
-list(soup.children)[28] = Team Stats, Fumbles-Lost
-  list(a.children)[1].get_text() = Category
-  list(a.children)[3].get_text() = Away 
-  list(a.children)[5].get_text() = Home 
+list(list(soup.children)[28].stripped_strings) = Team Stats, Fumbles-Lost
+  list(a.children)[0].get_text() = Category
+  list(a.children)[1].get_text() = Away 
+  list(a.children)[2].get_text() = Home 
 
-list(soup.children)[30] = Team Stats, Punts-Avg
-  list(a.children)[1].get_text() = Category
-  list(a.children)[3].get_text() = Away 
-  list(a.children)[5].get_text() = Home 
+list(list(soup.children)[30].stripped_strings) = Team Stats, Punts-Avg
+  list(a.children)[0].get_text() = Category
+  list(a.children)[1].get_text() = Away 
+  list(a.children)[2].get_text() = Home 
 
-list(soup.children)[32] = Team Stats, KR-Avg
-  list(a.children)[1].get_text() = Category
-  list(a.children)[3].get_text() = Away 
-  list(a.children)[5].get_text() = Home 
+list(list(soup.children)[32].stripped_strings) = Team Stats, KR-Avg
+  list(a.children)[0].get_text() = Category
+  list(a.children)[1].get_text() = Away 
+  list(a.children)[2].get_text() = Home 
 
-list(soup.children)[34] = Team Stats, PR-Avg
-  list(a.children)[1].get_text() = Category
-  list(a.children)[3].get_text() = Away 
-  list(a.children)[5].get_text() = Home 
+list(list(soup.children)[34].stripped_strings) = Team Stats, PR-Avg
+  list(a.children)[0].get_text() = Category
+  list(a.children)[1].get_text() = Away 
+  list(a.children)[2].get_text() = Home 
 
-list(soup.children)[36] = Team Stats, Penalties-Yard
-  list(a.children)[1].get_text() = Category
-  list(a.children)[3].get_text() = Away 
-  list(a.children)[5].get_text() = Home 
+list(list(soup.children)[36].stripped_strings) = Team Stats, Penalties-Yard
+  list(a.children)[0].get_text() = Category
+  list(a.children)[1].get_text() = Away 
+  list(a.children)[2].get_text() = Home 
 
-list(soup.children)[38] = Team Stats, Time of Possession
-  list(a.children)[1].get_text() = Category
-  list(a.children)[3].get_text() = Away 
-  list(a.children)[5].get_text() = Home 
+list(list(soup.children)[38].stripped_strings) = Team Stats, Time of Possession
+  list(a.children)[0].get_text() = Category
+  list(a.children)[1].get_text() = Away 
+  list(a.children)[2].get_text() = Home 
 
-list(soup.children)[44] = Player Stats
-   list(a.children)[1] = Next Step
-     list(n.children)[1] = Rushing Stats Table
-       list(r.children)[1] = Away Wrapper
-         list(b.children)[1] = Away Wrapper 2
-           list(c.children)[1] = Table Header
-           list(c.children)[3] = Players
-Formula:    len(list(c.children)[3]) / 2 - 0.5 =  of players in stat table
-             list(d.children)[X] = X Player's Stats
-Formula:      len(list(e.children)[X]) / 2 - 0.5 =  of stats in stat table
+
+s = list(list(list(list(list(list(soup.children)[44])[1])[1])[3])[1])[3] = Away Stats
+Formula:    len(list(s)) / 2 - 0.5 =  of players in stat table
+             e = list(list(list(s.children)[X].stripped_strings)) = X Player's Stats
 Formula:      for i in range(len(list(e.children)[X]) / 2 - 0.5):
                   dataFrame.append(list(e.children)[i * 2 - 1]))
                list(e.children)[1] = Year + Player
@@ -172,7 +166,7 @@ Formula:          Replaces the html character for a space in the player's name
                list(e.children)[11] = TD
 Formula:         str(list(f.children)[0]) = Text Value
 
-
+list(list(list(list(list(list(soup.children)[44])[1])[1])[3])[1])[3] = Away Stats
        list(r.children)[3] = Home Wrapper
 
      list(n.children)[3] = Receiving Stats Table
