@@ -59,6 +59,7 @@ s = list(list(list(soup.children)[2])[3])[8]
 
 list(soup.children)[3].get_text()[5:] = away team: Team, Mascot
 list(soup.children)[4].get_text()[5:] = home team: Team, Mascot
+##Build an error check here to ensure that the link pulled from Excel equals the data from the website
 
 list(soup.children)[6] = Team Stats, First Downs
   list(a.children)[1].get_text() = Category
