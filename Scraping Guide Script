@@ -147,9 +147,8 @@ list(list(soup.children)[38].stripped_strings) = Team Stats, Time of Possession
   list(a.children)[2].get_text() = Home 
 
 
-s = list(list(list(list(list(list(soup.children)[44])[1])[1])[3])[1])[3] = Away Stats
-Formula:    len(list(s)) / 2 - 0.5 =  of players in stat table
-             e = list(list(list(s.children)[X].stripped_strings)) = X Player's Stats
+s = list(list(list(list(list(list(soup.children)[44])[1])[1])[3])[1])[3] = Home RB Stats
+
 Formula:      for i in range(len(list(e.children)[X]) / 2 - 0.5):
                   dataFrame.append(list(e.children)[i * 2 - 1]))
                list(e.children)[1] = Year + Player
@@ -166,7 +165,31 @@ Formula:          Replaces the html character for a space in the player's name
                list(e.children)[11] = TD
 Formula:         str(list(f.children)[0]) = Text Value
 
-list(list(list(list(list(list(soup.children)[44])[1])[1])[3])[1])[3] = Away Stats
+##   Runs through Players, picking up the stats and info for Away RBs
+###   Change to +.5 if you need evens
+
+import pandas as pd
+
+rbTest = pd.DataFrame([], columns = rushTitle)
+
+for i in range((int(len(list(s.children))/2-.5))):
+	appTest.append(list(list(s.children)[int((i+.5)*2)].stripped_strings)[1])
+	appTest.append(list(soup.children)[4].get_text()[5:])
+	##This below is to append the week, get from Excel file
+	appTest.append(INSERT CODE TO GET EXCEL VALUE)
+	appTest.append(list(soup.children)[3].get_text()[5:])
+	appTest.append(list(list(s.children)[int((i+.5)*2)].stripped_strings)[2])
+	appTest.append(list(list(s.children)[int((i+.5)*2)].stripped_strings)[3])
+	appTest.append(list(list(s.children)[int((i+.5)*2)].stripped_strings)[4])
+	appTest.append(list(list(s.children)[int((i+.5)*2)].stripped_strings)[5])
+	appTest.append(list(list(s.children)[int((i+.5)*2)].stripped_strings)[6])
+##	print(appTest)
+	rbTest.loc[len(rbTest)] = appTest
+##	print(rbTest)
+	appTest = []
+
+
+list(list(list(list(list(list(soup.children)[44])[1])[1])[3])[1])[3] = Home Stats
        list(r.children)[3] = Home Wrapper
 
      list(n.children)[3] = Receiving Stats Table
