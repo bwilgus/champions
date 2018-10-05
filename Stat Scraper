@@ -3,30 +3,31 @@ from requests.exceptions import RequestException
 from bs4 import BeautifulSoup
 import xlrd
 import os
+import pandas as pd
 
 #Excel Scripts
 #This will need a library that writes to excel
 
 gameURL = 'https://www.google.com'
-passTitle = [['Name','Team','Opp','Comp','Att','Yds','TD','INT']]
+passTitle = [['Name','Team','Week','Opp','Comp','Att','Yds','TD','INT']]
 passAdd = []
-passStats = []
+passStats = pd.Dataframe([], columns = passTitle)
 
-rushTitle = [['Name','Team','Opp','Att','Yds','20+','Long','TD']]
+rushTitle = [['Name','Team','Week','Opp','Att','Yds','20+','Long','TD']]
 rushAdd = []
-rushStats = []
+rushStats = pd.Dataframe([], columns = rushTitle)
 
-rectTitle = [['Name','Team','Opp','Rec','Yds','20+','40+','Long','TD']]
+rectTitle = [['Name','Team','Week','Opp','Rec','Yds','20+','40+','Long','TD']]
 recAdd = []
-recStats = []
+recStats = pd.Dataframe([], columns = recTitle)
 
-defTitle = [['Name','Team','Opp','Sacks','INT']]
+defTitle = [['Name','Team','Week','Opp','Sacks','INT']]
 defAdd = []
-defStats = []
+defStats = pd.Dataframe([], columns = defTitle)
 
-fgTitle = [['Name','Team','Opp','Made','Missed']]
+fgTitle = [['Name','Team','Week','Opp','Made','Missed']]
 fgAdd = []
-fgStats = []
+fgStats = pd.Dataframe([], columns = fgTitle)
 
 find = []
 
