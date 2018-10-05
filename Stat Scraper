@@ -1,41 +1,449 @@
 from requests import get
 from requests.exceptions import RequestException
+from contextlib import closing
 from bs4 import BeautifulSoup
-import xlrd
-import os
 import pandas as pd
+import numpy as np
 
-#Excel Scripts
-#This will need a library that writes to excel
+wk = 0
 
-gameURL = 'https://www.google.com'
+
+
+
+gameURL = ''
+
 passTitle = [['Name','Team','Week','Opp','Comp','Att','Yds','TD','INT']]
-passAdd = []
-passStats = pd.Dataframe([], columns = passTitle)
+passStats = pd.DataFrame([], columns = passTitle)
 
 rushTitle = [['Name','Team','Week','Opp','Att','Yds','20+','Long','TD']]
-rushAdd = []
-rushStats = pd.Dataframe([], columns = rushTitle)
+rushStats = pd.DataFrame([], columns = rushTitle)
 
-rectTitle = [['Name','Team','Week','Opp','Rec','Yds','20+','40+','Long','TD']]
-recAdd = []
-recStats = pd.Dataframe([], columns = recTitle)
+recTitle = [['Name','Team','Week','Opp','Rec','Yds','20+','40+','Long','TD']]
+recStats = pd.DataFrame([], columns = recTitle)
 
 defTitle = [['Name','Team','Week','Opp','Sacks','INT']]
-defAdd = []
-defStats = pd.Dataframe([], columns = defTitle)
+defStats = pd.DataFrame([], columns = defTitle)
 
 fgTitle = [['Name','Team','Week','Opp','Made','Missed']]
-fgAdd = []
-fgStats = pd.Dataframe([], columns = fgTitle)
+fgStats = pd.DataFrame([], columns = fgTitle)
 
-find = []
-
-##Washington @ Utah 4OT game
-#Use for testing and requirements gathering
-#'https://www.whatifsports.com/ncaafb/boxscore.asp?gameid=9916648&nomenu=1&ad=0'
+statsAdd = []
 
 
+###
+
+#Away Offensive Stats
+AOS = pd.DataFrame([],
+                columns = ['team', 'week', 'opp', 'fd', 'rfd', 'pfd', 'penfd', '3de', '4de', 'rushatt', 'rYds', 'avgrush', 'comp', 'passatt',\
+                           'intthrown', 'sack', 'sackyds', 'fumbles', 'flost', 'punt', 'pavg', 'kr', 'kravg', 'pr', 'pravg' 'pens', 'penyds', 'top']
+                         )
+AOA = []
+
+#Away Defensive Stats                            
+ADS = pd.DataFrame([],
+                columns = ['team', 'week', 'opp', 'fd allowed', 'rfd allowed', 'pfd allowed', 'penfd allowed', '3de allowed', '4de allowed', 'rushatt allowed', 'rYds allowed', 'avgrush allowed', 'comp allowed', 'passatt allowed', \
+                           'ints taken', 'sacks made', 'sackyds made', 'ff', 'fr', 'kr allowed', 'kravg allowed', 'pr allowed', 'pravg allowed']
+                            )
+ADA=[]
+
+#Home Offensive Stats
+HOS = pd.DataFrame([],
+                columns = ['team', 'week', 'opp', 'fd', 'rfd', 'pfd', 'penfd', '3de', '4de', 'rushatt', 'rYds', 'avgrush', 'comp', 'passatt',\
+                           'intthrown', 'sack', 'sackyds', 'fumbles', 'flost', 'punt', 'pavg', 'kr', 'kravg', 'pr', 'pravg' 'pens', 'penyds', 'top']
+                         )
+HOA=[]
+
+#Home Defensive Stats                            
+HDS = pd.DataFrame([],
+                columns = ['team', 'week', 'opp', 'fd allowed', 'rfd allowed', 'pfd allowed', 'penfd allowed', '3de allowed', '4de allowed', 'rushatt allowed', 'rYds allowed', 'avgrush allowed', 'comp allowed', 'passatt allowed', \
+                           'ints taken', 'sacks made', 'sackyds made', 'ff', 'fr', 'kr allowed', 'kravg allowed', 'pr allowed', 'pravg allowed']
+                            )
+HDA=[]
+
+####
 
 
+#### Some notes
+#    df.describe() gives some interesting stats, where df=pd.read_csv('sample.csv')
+#    df['Col'].describe() focuses on a specific column
+#    df.iloc[0:1,0:1] or whichever number combination gives certain data from the df
+#    df[df['Name'] == 'Jon'] gives the whole row w/ Jon
+#    new_df = df[['Name', 'TDs']] creates a new dataframe w/ the particular columns
+
+##Locker
+#Holds all saved games
+#https://www.whatifsports.com/locker/saved_games.asp?view=1
+
+##Box Score IDs
+#Scoreline id = 'scoresummary'
+#Team Stats id = 'gamestats'
+#
+
+gameURLs = {}
+
+
+##Beautiful Soup Functions#####################################################################
+def simple_get(url):
+    """
+    Attempts to get the content at `url` by making an HTTP GET request.
+    If the content-type of response is some kind of HTML/XML, return the
+    text content, otherwise return None.
+    """
+    try:
+        with closing(get(url, stream=True)) as resp:
+            if is_good_response(resp):
+                return resp.content
+            else:
+                return None
+
+    except RequestException as e:
+        log_error('Error during requests to {0} : {1}'.format(url, str(e)))
+        return None
+
+def is_good_response(resp):
+    """
+    Returns True if the response seems to be HTML, False otherwise
+    """
+    content_type = resp.headers['Content-Type'].lower()
+    return (resp.status_code == 200 
+            and content_type is not None 
+            and content_type.find('html') > -1)
+
+
+def log_error(e):
+    """
+    It is always a good idea to log errors. 
+    This function just prints them, but you can
+    make it do anything.
+    """
+    print(e)
+
+    
 ###############################################################################################
+
+    #My Functions
+
+def gameLog(q):
+    gameID = str(gameURL[(gameURL.find('gameid=')+7):gameURL.find('&nomenu')])
+    pbpURL = 'https://www.whatifsports.com/ncaafb/pbp.asp?gameid=' + gameID + '&qtr=' + str(q)
+    return pbpURL
+
+def bSoup(U):
+    global gameURL
+    global q1, q2, q3, q4
+    global raw_html, soup
+    gameURL = U
+    q1 = gameLog(1)
+    q2 = gameLog(2)
+    q3 = gameLog(3)
+    q4 = gameLog(4)
+    raw_html = simple_get(U)
+    soup = BeautifulSoup(raw_html, 'html.parser')
+
+def chopSoup():
+    global ars, hrs, arecs, hrecs, aps, hps, ads, hds, afs, hfs
+    ##Away Rush
+    ars = list(list(list(list(list(list(soup.children)[44])[1])[1])[1])[1])[3]
+
+    ##Home Rush
+    hrs = list(list(list(list(list(list(soup.children)[44])[1])[1])[3])[1])[3]
+  
+    ##Away Rec
+    arecs = list(list(list(list(list(list(soup.children)[44])[1])[3])[1])[1])[3]
+  
+    ##Home Rec
+    hrecs = list(list(list(list(list(list(soup.children)[44])[1])[3])[3])[1])[3]
+  
+    ##Away Pass
+    aps = list(list(list(list(list(list(soup.children)[44])[1])[5])[1])[1])[3]
+  
+    ##Home Pass
+    hps = list(list(list(list(list(list(soup.children)[44])[1])[5])[3])[1])[3]
+  
+    ##Away Def
+    ads = list(list(list(list(list(list(soup.children)[44])[1])[7])[1])[1])[3]
+  
+    ##Home Def
+    hds = list(list(list(list(list(list(soup.children)[44])[1])[7])[3])[1])[3]
+  
+    ##Away FG
+    try: afs = list(list(list(list(list(list(soup.children)[44])[1])[9])[1])[1])[3]
+    except: afs = None
+    
+    ##Home FG
+    hfs = list(list(list(list(list(list(soup.children)[44])[1])[9])[3])[1])[3]
+
+
+def washUtah():
+    bSoup('https://www.whatifsports.com/ncaafb/boxscore.asp?gameid=9916648&nomenu=1&ad=0')
+
+def boiseTroy():
+    bSoup('https://www.whatifsports.com/ncaafb/boxscore.asp?gameid=9891802&nomenu=1&ad=1')
+    
+
+################################################################################################
+
+
+def grabStats():
+    #Away
+    ###Rush
+    global home, away, ars, hrs, arecs, hrecs, aps, hps, ads, hds, afs, hfs
+    
+    global a1d, a1dr, a1dp, a1dpen, a3de, a4de, aRA, aRY, aAvgR, aPC, aPA, aIT, aSck, aSckYds\
+           , aFum, aFL, aPunt, aPAvg, aKR, aKRAvg, aPR, aPRAvg, aPens, aPenYds, aTOP, h1d, h1dr\
+           , h1dp, h1dpen, h3de, h4de, hRA, hRY, hAvgR, hPC, hPA, hIT, hSck, hSckYds, hFum, hFL\
+           , hPunt, hPAvg, hKR, hKRAvg, hPR, hPRAvg, hPens, hPenYds, hTOP
+    
+    global rushStats, passStats, recStats, defStats, fgStats, statsAdd, wk
+    global AOS, ADS, AOA, ADA
+    global HOS, HDS, HOA, HDA
+
+    home = list(soup.children)[4].get_text()[5:]
+    away = list(soup.children)[3].get_text()[5:]
+    
+    for i in range((int(len(list(ars.children))/2-.5))):
+        statsAdd.append(list(list(ars.children)[int((i+.5)*2)].stripped_strings)[1])
+        statsAdd.append(list(soup.children)[3].get_text()[5:])
+	##Use this for week, need to grab from Excel File
+        statsAdd.append(wk)
+        statsAdd.append(list(soup.children)[4].get_text()[5:])
+        statsAdd.append(int(list(list(ars.children)[int((i+.5)*2)].stripped_strings)[2]))
+        statsAdd.append(int(list(list(ars.children)[int((i+.5)*2)].stripped_strings)[3]))
+        statsAdd.append(int(list(list(ars.children)[int((i+.5)*2)].stripped_strings)[4]))
+        statsAdd.append(int(list(list(ars.children)[int((i+.5)*2)].stripped_strings)[5]))
+        statsAdd.append(int(list(list(ars.children)[int((i+.5)*2)].stripped_strings)[6]))
+        rushStats.loc[len(rushStats)] = statsAdd
+        statsAdd = []
+
+
+    ###Rec
+    for i in range((int(len(list(arecs.children))/2-.5))):
+        statsAdd.append(list(list(arecs.children)[int((i+.5)*2)].stripped_strings)[1])
+        statsAdd.append(list(soup.children)[3].get_text()[5:])
+        ##Use this for week, need to grab from Excel File
+        statsAdd.append(wk)
+        statsAdd.append(list(soup.children)[4].get_text()[5:])
+        statsAdd.append(int(list(list(arecs.children)[int((i+.5)*2)].stripped_strings)[2]))
+        statsAdd.append(int(list(list(arecs.children)[int((i+.5)*2)].stripped_strings)[3]))
+        statsAdd.append(int(list(list(arecs.children)[int((i+.5)*2)].stripped_strings)[4]))
+        statsAdd.append(int(list(list(arecs.children)[int((i+.5)*2)].stripped_strings)[5]))
+        statsAdd.append(int(list(list(arecs.children)[int((i+.5)*2)].stripped_strings)[6]))
+        statsAdd.append(int(list(list(arecs.children)[int((i+.5)*2)].stripped_strings)[7]))
+        recStats.loc[len(recStats)] = statsAdd
+        statsAdd = []
+
+	
+    ###Pass
+    for i in range((int(len(list(aps.children))/2-.5))):
+        statsAdd.append(list(list(aps.children)[int((i+.5)*2)].stripped_strings)[1])
+        statsAdd.append(list(soup.children)[3].get_text()[5:])
+	##Use this for week, need to grab from Excel File
+        statsAdd.append(wk)
+        statsAdd.append(list(soup.children)[4].get_text()[5:])
+        statsAdd.append(int(list(list(aps.children)[int((i+.5)*2)].stripped_strings)[2]))
+        statsAdd.append(int(list(list(aps.children)[int((i+.5)*2)].stripped_strings)[3]))
+        statsAdd.append(int(list(list(aps.children)[int((i+.5)*2)].stripped_strings)[4]))
+        statsAdd.append(int(list(list(aps.children)[int((i+.5)*2)].stripped_strings)[5]))
+        statsAdd.append(int(list(list(aps.children)[int((i+.5)*2)].stripped_strings)[6]))
+        passStats.loc[len(passStats)] = statsAdd
+        statsAdd = []
+
+	
+    ###Def	
+    for i in range((int(len(list(ads.children))/2-.5))):
+        statsAdd.append(list(list(ads.children)[int((i+.5)*2)].stripped_strings)[1])
+        statsAdd.append(list(soup.children)[3].get_text()[5:])
+        ##Use this for week, need to grab from Excel File
+        statsAdd.append(wk)
+        statsAdd.append(list(soup.children)[4].get_text()[5:])
+        statsAdd.append(int(list(list(ads.children)[int((i+.5)*2)].stripped_strings)[2]))
+        statsAdd.append(int(list(list(ads.children)[int((i+.5)*2)].stripped_strings)[3]))
+        defStats.loc[len(defStats)] = statsAdd
+        statsAdd = []
+	
+
+    ###FG
+    if afs != None:
+        for i in range((int(len(list(afs.children))/2-.5))):
+            statsAdd.append(list(list(afs.children)[int((i+.5)*2)].stripped_strings)[1])
+            statsAdd.append(list(soup.children)[3].get_text()[5:])
+            ##Use this for week, need to grab from Excel File
+            statsAdd.append(wk)
+            statsAdd.append(list(soup.children)[4].get_text()[5:])
+            statsAdd.append(list(list(afs.children)[int((i+.5)*2)].stripped_strings)[2])
+            statsAdd.append(list(list(afs.children)[int((i+.5)*2)].stripped_strings)[3])
+            fgStats.loc[len(fgStats)] = statsAdd
+            statsAdd = []
+
+
+
+
+
+
+    #Home
+    ###Rush
+    for i in range((int(len(list(hrs.children))/2-.5))):
+        statsAdd.append(list(list(hrs.children)[int((i+.5)*2)].stripped_strings)[1])
+        statsAdd.append(list(soup.children)[4].get_text()[5:])
+	##Use this for week, need to grab from Excel File
+        statsAdd.append(wk)
+        statsAdd.append(list(soup.children)[3].get_text()[5:])
+        statsAdd.append(int(list(list(hrs.children)[int((i+.5)*2)].stripped_strings)[2]))
+        statsAdd.append(int(list(list(hrs.children)[int((i+.5)*2)].stripped_strings)[3]))
+        statsAdd.append(int(list(list(hrs.children)[int((i+.5)*2)].stripped_strings)[4]))
+        statsAdd.append(int(list(list(hrs.children)[int((i+.5)*2)].stripped_strings)[5]))
+        statsAdd.append(int(list(list(hrs.children)[int((i+.5)*2)].stripped_strings)[6]))
+        rushStats.loc[len(rushStats)] = statsAdd
+        statsAdd = []
+
+
+    ###Rec
+    for i in range((int(len(list(hrecs.children))/2-.5))):
+        statsAdd.append(list(list(hrecs.children)[int((i+.5)*2)].stripped_strings)[1])
+        statsAdd.append(list(soup.children)[4].get_text()[5:])
+        ##Use this for week, need to grab from Excel File
+        statsAdd.append(wk)
+        statsAdd.append(list(soup.children)[3].get_text()[5:])
+        statsAdd.append(int(list(list(hrecs.children)[int((i+.5)*2)].stripped_strings)[2]))
+        statsAdd.append(int(list(list(hrecs.children)[int((i+.5)*2)].stripped_strings)[3]))
+        statsAdd.append(int(list(list(hrecs.children)[int((i+.5)*2)].stripped_strings)[4]))
+        statsAdd.append(int(list(list(hrecs.children)[int((i+.5)*2)].stripped_strings)[5]))
+        statsAdd.append(int(list(list(hrecs.children)[int((i+.5)*2)].stripped_strings)[6]))
+        statsAdd.append(int(list(list(hrecs.children)[int((i+.5)*2)].stripped_strings)[7]))
+        recStats.loc[len(recStats)] = statsAdd
+        statsAdd = []
+
+	
+    ###Pass
+    for i in range((int(len(list(hps.children))/2-.5))):
+        statsAdd.append(list(list(hps.children)[int((i+.5)*2)].stripped_strings)[1])
+        statsAdd.append(list(soup.children)[4].get_text()[5:])
+	##Use this for week, need to grab from Excel File
+        statsAdd.append(wk)
+        statsAdd.append(list(soup.children)[3].get_text()[5:])
+        statsAdd.append(int(list(list(hps.children)[int((i+.5)*2)].stripped_strings)[2]))
+        statsAdd.append(int(list(list(hps.children)[int((i+.5)*2)].stripped_strings)[3]))
+        statsAdd.append(int(list(list(hps.children)[int((i+.5)*2)].stripped_strings)[4]))
+        statsAdd.append(int(list(list(hps.children)[int((i+.5)*2)].stripped_strings)[5]))
+        statsAdd.append(int(list(list(hps.children)[int((i+.5)*2)].stripped_strings)[6]))
+        passStats.loc[len(passStats)] = statsAdd
+        statsAdd = []
+
+	
+    ###Def	
+    for i in range((int(len(list(hds.children))/2-.5))):
+        statsAdd.append(list(list(hds.children)[int((i+.5)*2)].stripped_strings)[1])
+        statsAdd.append(list(soup.children)[4].get_text()[5:])
+        ##Use this for week, need to grab from Excel File
+        statsAdd.append(wk)
+        statsAdd.append(list(soup.children)[3].get_text()[5:])
+        statsAdd.append(int(list(list(hds.children)[int((i+.5)*2)].stripped_strings)[2]))
+        statsAdd.append(int(list(list(hds.children)[int((i+.5)*2)].stripped_strings)[3]))
+        defStats.loc[len(defStats)] = statsAdd
+        statsAdd = []
+	
+
+    ###FG
+    for i in range((int(len(list(hfs.children))/2-.5))):
+        statsAdd.append(list(list(hfs.children)[int((i+.5)*2)].stripped_strings)[1])
+        statsAdd.append(list(soup.children)[4].get_text()[5:])
+        ##Use this for week, need to grab from Excel File
+        statsAdd.append(wk)
+        statsAdd.append(list(soup.children)[3].get_text()[5:])
+        statsAdd.append(list(list(hfs.children)[int((i+.5)*2)].stripped_strings)[2])
+        statsAdd.append(list(list(hfs.children)[int((i+.5)*2)].stripped_strings)[3])
+        fgStats.loc[len(fgStats)] = statsAdd
+        statsAdd = []	
+
+
+    #Team Stats
+    ###Away
+    AOA.append(away)
+    AOA.append(home)
+    AOA.append(wk)
+
+    HOA.append(home)
+    HOA.append(away)
+    HOA.append(wk)
+    
+    	
+    a1d = list(list(soup.children)[6].stripped_strings)[1]
+    a1dr = list(list(soup.children)[8].stripped_strings)[1]
+    a1dp = list(list(soup.children)[10].stripped_strings)[1]
+    a1dpen = list(list(soup.children)[12].stripped_strings)[1]
+    a3de = list(list(soup.children)[14].stripped_strings)[1]
+    a4de = list(list(soup.children)[16].stripped_strings)[1]
+    aRA = str(list(list(soup.children)[18].stripped_strings)[1])[:str(list(list(soup.children)[18].stripped_strings)[1]).find('-')]
+    aRY = str(list(list(soup.children)[18].stripped_strings)[1])[str(list(list(soup.children)[18].stripped_strings)[1]).find('-')+1:]
+    aAvgR = str(list(list(soup.children)[20].stripped_strings)[1])[:str(list(list(soup.children)[20].stripped_strings)[1]).find("-")]
+    aPC = str(list(list(soup.children)[22].stripped_strings)[1])[:str(list(list(soup.children)[22].stripped_strings)[1]).find("-")]
+    aPA = str(str(list(list(soup.children)[22].stripped_strings)[1])[str(list(list(soup.children)[22].stripped_strings)[1]).find("-")+1:])[:str(str(list(list(soup.children)[22].stripped_strings)[1])[str(list(list(soup.children)[22].stripped_strings)[1]).find("-")+1:]).find('-')]
+    aIT = str(str(list(list(soup.children)[22].stripped_strings)[1])[str(list(list(soup.children)[22].stripped_strings)[1]).find("-")+1:])[str(str(list(list(soup.children)[22].stripped_strings)[1])[str(list(list(soup.children)[22].stripped_strings)[1]).find("-")+1:]).find('-')+1:]
+    aPY = list(list(soup.children)[24].stripped_strings)[1]
+    aSck = str(list(list(soup.children)[26].stripped_strings)[1])[:str(list(list(soup.children)[26].stripped_strings)[1]).find('-')]
+    aSckYds = str(list(list(soup.children)[26].stripped_strings)[1])[str(list(list(soup.children)[26].stripped_strings)[1]).find('-')+1:]
+    aFum = str(list(list(soup.children)[28].stripped_strings)[1])[:str(list(list(soup.children)[26].stripped_strings)[1]).find('-')]
+    aFL = str(list(list(soup.children)[28].stripped_strings)[1])[str(list(list(soup.children)[26].stripped_strings)[1]).find('-')+1:]
+    aPunt = str(list(list(soup.children)[30].stripped_strings)[1])[:str(list(list(soup.children)[26].stripped_strings)[1]).find('-')]
+    aPAvg = str(list(list(soup.children)[30].stripped_strings)[1])[str(list(list(soup.children)[26].stripped_strings)[1]).find('-')+1:]
+    aKR = str(list(list(soup.children)[32].stripped_strings)[1])[:str(list(list(soup.children)[26].stripped_strings)[1]).find('-')]
+    aKRvg = str(list(list(soup.children)[32].stripped_strings)[1])[str(list(list(soup.children)[26].stripped_strings)[1]).find('-')+1:]
+    aPR = str(list(list(soup.children)[34].stripped_strings)[1])[:str(list(list(soup.children)[26].stripped_strings)[1]).find('-')]
+    PRAvg = str(list(list(soup.children)[34].stripped_strings)[1])[str(list(list(soup.children)[26].stripped_strings)[1]).find('-')+1:]
+    aPunt = str(list(list(soup.children)[36].stripped_strings)[1])[:str(list(list(soup.children)[26].stripped_strings)[1]).find('-')]
+    aPAvg = str(list(list(soup.children)[36].stripped_strings)[1])[str(list(list(soup.children)[26].stripped_strings)[1]).find('-')+1:]
+    aTOP = list(list(soup.children)[38].stripped_strings)[1]
+
+    
+
+    h1d = list(list(soup.children)[6].stripped_strings)[2]
+    h1dr = list(list(soup.children)[8].stripped_strings)[2]
+    h1dp = list(list(soup.children)[10].stripped_strings)[2]
+    h1dpen = list(list(soup.children)[12].stripped_strings)[2]
+    h3de = list(list(soup.children)[14].stripped_strings)[2]
+    h4de = list(list(soup.children)[16].stripped_strings)[2]
+    hRA = str(list(list(soup.children)[18].stripped_strings)[2])[:str(list(list(soup.children)[18].stripped_strings)[2]).find('-')]
+    hRY = str(list(list(soup.children)[18].stripped_strings)[2])[str(list(list(soup.children)[18].stripped_strings)[2]).find('-')+1:]
+    hAvgR = str(list(list(soup.children)[20].stripped_strings)[2])[:str(list(list(soup.children)[20].stripped_strings)[1]).find("-")]
+    hPC = str(list(list(soup.children)[22].stripped_strings)[2])[:str(list(list(soup.children)[22].stripped_strings)[1]).find("-")]
+    hPA = str(str(list(list(soup.children)[22].stripped_strings)[2])[str(list(list(soup.children)[22].stripped_strings)[1]).find("-")+1:])[:str(str(list(list(soup.children)[22].stripped_strings)[1])[str(list(list(soup.children)[22].stripped_strings)[1]).find("-")+1:]).find('-')]
+    hIT = str(str(list(list(soup.children)[22].stripped_strings)[2])[str(list(list(soup.children)[22].stripped_strings)[1]).find("-")+1:])[str(str(list(list(soup.children)[22].stripped_strings)[1])[str(list(list(soup.children)[22].stripped_strings)[1]).find("-")+1:]).find('-')+1:]
+    hPY = list(list(soup.children)[24].stripped_strings)[2]
+    hSck = str(list(list(soup.children)[26].stripped_strings)[2])[:str(list(list(soup.children)[26].stripped_strings)[2]).find('-')]
+    hSckYds = str(list(list(soup.children)[26].stripped_strings)[2])[str(list(list(soup.children)[26].stripped_strings)[2]).find('-')+1:]
+    hFum = str(list(list(soup.children)[28].stripped_strings)[2])[:str(list(list(soup.children)[28].stripped_strings)[2]).find('-')]
+    hFL = str(list(list(soup.children)[28].stripped_strings)[2])[str(list(list(soup.children)[28].stripped_strings)[2]).find('-')+1:]
+    hPunt = str(list(list(soup.children)[30].stripped_strings)[2])[:str(list(list(soup.children)[30].stripped_strings)[2]).find('-')]
+    hPAvg = str(list(list(soup.children)[30].stripped_strings)[2])[str(list(list(soup.children)[30].stripped_strings)[2]).find('-')+1:]
+    hKR = str(list(list(soup.children)[32].stripped_strings)[2])[:str(list(list(soup.children)[32].stripped_strings)[2]).find('-')]
+    hKRvg = str(list(list(soup.children)[32].stripped_strings)[2])[str(list(list(soup.children)[32].stripped_strings)[2]).find('-')+1:]
+    hPR = str(list(list(soup.children)[34].stripped_strings)[2])[:str(list(list(soup.children)[34].stripped_strings)[2]).find('-')]
+    hPRAvg = str(list(list(soup.children)[34].stripped_strings)[2])[str(list(list(soup.children)[34].stripped_strings)[2]).find('-')+1:]
+    hPunt = str(list(list(soup.children)[36].stripped_strings)[2])[:str(list(list(soup.children)[36].stripped_strings)[2]).find('-')]
+    hPAvg = str(list(list(soup.children)[36].stripped_strings)[2])[str(list(list(soup.children)[36].stripped_strings)[2]).find('-')+1:]
+    hTOP = list(list(soup.children)[38].stripped_strings)[2]
+
+    AOA = [home, wk, away, a1d, a1dr, a1dp, a1dpen, a3de, a4de, aRA, aRY, aAvgR, aPC, aPA, aIT, aSck, aSckYds\
+           , aFum, aFL, aPunt, aPAvg, aKR, aKRAvg, aPR, aPRAvg, aPens, aPenYds, aTOP]
+
+
+    HOA = [home, wk, away, a1d, a1dr, a1dp, a1dpen, a3de, a4de, aRA, aRY, aAvgR, aPC, aPA, aIT, aSck, aSckYds\
+           , aFum, aFL, aPunt, aPAvg, aKR, aKRAvg, aPR, aPRAvg, aPens, aPenYds, aTOP]
+    
+
+    ADA.append(away)
+    ADA.append(home)
+    ADA.append(wk)
+
+    
+    h1d
+
+    HDA.append(home)
+    HDA.append(away)
+    HDA.append(wk)
+    
+
+
+
+
+
