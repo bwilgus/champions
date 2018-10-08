@@ -431,17 +431,84 @@ def grabStats():
            , aFum, aFL, aPunt, aPAvg, aKR, aKRAvg, aPR, aPRAvg, aPens, aPenYds, aTOP]
     
 
-    ADA.append(away)
-    ADA.append(home)
-    ADA.append(wk)
 
+def getGameURL():
     
-    h1d
+    elems = browser.find_elements_by_xpath("//a[@href]")
+    for elem in elems:
+        if str(elem.get_attribute("href")).find('GameID=') > 0:
+            return elem.get_attribute("href")
 
-    HDA.append(home)
-    HDA.append(away)
-    HDA.append(wk)
-    
+homeTeam = 'Oregon'
+awayTeam = 'Alabama'
+
+browser = webdriver.Chrome()
+browser.get('http://www.whatifsports.com/ncaafb')
+
+away = browser.find_element_by_name('vname')
+home = browser.find_element_by_name('hname')
+ayear = browser.find_element_by_name('vseason')
+hyear = browser.find_element_by_name('hseason')
+
+
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as ec
+
+hWins = 0
+aWins = 0
+winner = ""
+
+
+away.send_keys(homeTeam)
+ayear.send_keys('2014')
+home.send_keys(awayTeam)
+hyear.send_keys('2014')
+
+abutton = browser.find_element_by_id('visitorbtn')
+abutton.send_keys(Keys.RETURN)
+
+hbutton = browser.find_element_by_id('homebtn')
+hbutton.send_keys(Keys.RETURN)
+
+while hWins < 4 and aWins < 4:
+    playbutton = browser.find_element_by_xpath("//*[@id='playBtn']")
+    playbutton.send_keys(Keys.RETURN)
+
+
+
+    boxURL = getGameURL()
+    ##
+    ##print(boxURL)
+    ##
+
+
+    bSoup(boxURL)
+
+    s = list(list(list(list(list(list(soup.children)[2])[3])[8])[1])[1])[3]
+    hScore = list(s.stripped_strings)[len(list(s.stripped_strings))-1]
+
+    s = list(list(list(list(list(list(soup.children)[2])[3])[8])[1])[1])[5]
+    aScore = list(s.stripped_strings)[len(list(s.stripped_strings))-1]
+
+    if hScore > aScore:
+        hWins = hWins + 1
+    elif aScore > hScore:
+        aWins = aWins + 1
+    else:
+        print("Something has gone wrong here")
+
+    if hWins == 4:
+        winner = homeTeam
+    elif aWins == 4:
+        winner = awayTeam
+
+    xbutton = browser.find_element_by_xpath("//*[@id='fancybox-close']")
+    xbutton.click()
+    print(homeTeam + ': ' + hScore + ' ' + awayTeam + ': ' + aScore)
+    print('Series: ' + str(hWins) + ' to ' + str(aWins))
+print(winner)
+
 
 
 
