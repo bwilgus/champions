@@ -2,46 +2,54 @@ from requests import get
 from requests.exceptions import RequestException
 from contextlib import closing
 from bs4 import BeautifulSoup
-import pdfkit
+
 import openpyxl
 from openpyxl import Workbook
 from openpyxl import load_workbook
+
+import os
+
+
 import selenium
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
-import os
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as ec
 
+###############################################################################################
 
+        ##Workbook Setup
 
-wkbkURL = r'C:\users\wilgu\desktop\blog\Season of Champions\Python\dataOutput_2.0.xlsx'
+wkbkURL = r'C:\users\wilgj\desktop\script test.xlsx'
 wb = load_workbook(wkbkURL)
-ws = wb['data']
-
-sNum = 2
-fNum = 10
-
-gID = 1
-
-atID = 2
-aConf = 3
-aRk = 4
-aName = 5
-aConc = 6
-aYr = 7
+ws = wb.active
 
 
 
-hID = 8
-hConf = 9
-hRk = 10
-hName = 11
-hConc = 12
-hYr = 13
 
-gLoc = 15
+#These variables denote which columns are which number.
+## A = 1, B = 2, C = 3, etc.
+
+##gID = 1
+
+##atID = 2
+##aConf = 3
+##aRk = 4
+##aName = 10
+##aConc = 6
+##aYr = 11
+
+
+
+##hID = 8
+##hConf = 9
+##hRk = 10
+##hName = 6
+##hConc = 12
+##hYr = 7
+
+##gLoc = 13
 week = 16
 winTeam = 17
 lossTeam = 18
@@ -52,31 +60,11 @@ homeWins = 23
 boxScoreURL = 24
 
 
-#Sets up the PDF saving
-path_wkthmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
-config = pdfkit.configuration(wkhtmltopdf=path_wkthmltopdf)
+###############################################################################################
 
-##gecko = r'C:\\Users\\wilgu\\Desktop\\Blog\\Season of Champions\\Python\\geckodriver'
-##binary = FirefoxBinary(r'C:\Program Files (x86)\Mozilla Firefox\firefox.exe')
-##browser = webdriver.Firefox(firefox_binary=binary, executable_path=gecko+'.exe')
-
-#Establishes browser
-browser = webdriver.Chrome(r'C:\chromedriver\chromedriver.exe')
-##browser = webdriver.Firefox()
-##browser = webdriver.IE(r'C:\Users\wilgu\Desktop\IEDriverServer_Win32_3.14.0\IEDriverServer.exe')
+    #BeautifulSoup Functions
 
 
-##inAway = browser.find_element_by_id("vname")
-##inHome = browser.find_element_by_id("hname")
-##inaYear = browser.find_element_by_id("vseason")
-##inhYear = browser.find_element_by_id("hseason")
-
-#Script that saves website as PDF
-#https://stackoverflow.com/questions/23359083/how-to-convert-webpage-into-pdf-by-using-python
-
-
-
-#BeautifulSoup functions
 def simple_get(url):
     """
     Attempts to get the content at `url` by making an HTTP GET request.
@@ -105,16 +93,7 @@ def is_good_response(resp):
 
 
 def log_error(e):
-    """
-    It is always a good idea to log errors. 
-    This function just prints them, but you can
-    make it do anything.
-    """
     print(e)
-
-    
-
-
 
 
 
@@ -150,23 +129,22 @@ def getGameURL():
     for elem in elems:
         if str(elem.get_attribute("href")).find('GameID=') > 0:
             return elem.get_attribute("href")
+###############################################################################################
+
+
+#Establishes browser
+browser = webdriver.Chrome()
 
 
 
+"""
+autoScript(sNum, fNum)
+This is the actual script that simulates the games.
+sNum is the first row accessed, default is 2 (accounting for a header)
+fNum is the last row accessed.
 
-################################################################################################
-
-def handyScript():
-    #finds the first table, could help flip through all tables
-    lt = []
-    for x in range(len(soup.find_all('table'))):
-        lt.append(soup.find_all('table')[x])
-
-
-        
-
-        print(str(i) + ' done')
-
+This could take a long time depending on how many games you intend to run.
+"""
 def autoScript(sNum = 2, fNum = len(ws['A'])):
     global browser
     global homeYear
@@ -179,7 +157,8 @@ def autoScript(sNum = 2, fNum = len(ws['A'])):
     for i in range(sNum,fNum):
         browser.get('https://www.whatifsports.com/ncaafb');
         element = WebDriverWait(browser, 10).until(ec.presence_of_element_located((By.ID, "homebtn")))
-        
+
+        #Grabs pertinent data out of the workbook        
         wk = ws.cell(i, week).value
         homeTeam = ws.cell(i, hName).value
         awayTeam = ws.cell(i, aName).value
@@ -187,9 +166,7 @@ def autoScript(sNum = 2, fNum = len(ws['A'])):
         aYear = ws.cell(i, aYr).value
         Loc = ws.cell(i, gLoc).value
 
-##        browser = webdriver.Chrome()
-##        browser.get('http://www.whatifsports.com/ncaafb')
-
+        #Locates team names and years by CSS name
         away = browser.find_element_by_name('vname')
         home = browser.find_element_by_name('hname')
         ayear = browser.find_element_by_name('vseason')
@@ -203,21 +180,28 @@ def autoScript(sNum = 2, fNum = len(ws['A'])):
         winner = ""
 
 
+        #Sets up Team and Year
         away.send_keys(awayTeam)
         ayear.send_keys(aYear)
         home.send_keys(homeTeam)
         hyear.send_keys(hYear)
 
-        abutton = browser.find_element_by_id('visitorbtn')
-        abutton.send_keys(Keys.RETURN)
+        #For some reason, Wyoming glitches out if its button is hit second.
+        #This assures it is clicked first.
+        if awayTeam == 'Wyoming':
+            abutton = browser.find_element_by_id('visitorbtn')
+            abutton.send_keys(Keys.RETURN)
+            hbutton = browser.find_element_by_id('homebtn')
+            hbutton.send_keys(Keys.RETURN)
+        else:            
+            hbutton = browser.find_element_by_id('homebtn')
+            hbutton.send_keys(Keys.RETURN)
+            abutton = browser.find_element_by_id('visitorbtn')
+            abutton.send_keys(Keys.RETURN)
 
-        hbutton = browser.find_element_by_id('homebtn')
-        hbutton.send_keys(Keys.RETURN)
-
-        print(Loc)
 
         
-
+        #Clicks the radio button denoting game location
         if Loc == "H":
             inLoc = browser.find_element_by_xpath("//input[@value=0]").click()
         elif Loc == "N":
@@ -225,31 +209,26 @@ def autoScript(sNum = 2, fNum = len(ws['A'])):
         else:
             print('Loc error on ' + away + ' v. ' + home)
 
-            inLoc.submit()
 
+        #Runs seven game series
         while hWins < 4 and aWins < 4:
             aScore = 0
             hScore = 0
 
+            #Hits 'Play'
             playbutton = browser.find_element_by_xpath("//*[@id='playBtn']")
             playbutton.send_keys(Keys.RETURN)
             
 
-
+            #Gets Game Score
             boxURL = getGameURL()
-            ##
-            ##print(boxURL)
-            ##
-
-
             bSoup(boxURL)
-
             s = list(list(list(list(list(list(soup.children)[2])[3])[8])[1])[1])[5]
             hScore = int(list(s.stripped_strings)[len(list(s.stripped_strings))-1])
-
             s = list(list(list(list(list(list(soup.children)[2])[3])[8])[1])[1])[3]
             aScore = int(list(s.stripped_strings)[len(list(s.stripped_strings))-1])
 
+            #Checks Best of Seven standing
             if int(hScore) > int(aScore):
                 hWins += 1
             else:
@@ -263,6 +242,7 @@ def autoScript(sNum = 2, fNum = len(ws['A'])):
                 winner = awayTeam
                 loser = homeTeam
 
+            #Closes pop in window, prints series standings
             xbutton = browser.find_element_by_xpath("//*[@id='fancybox-close']")
             xbutton.click()
             print(awayTeam + ': ' + str(aScore) + ' ' + homeTeam + ': ' + str(hScore))
@@ -270,6 +250,7 @@ def autoScript(sNum = 2, fNum = len(ws['A'])):
             
         print(winner + ' wins')
 
+        #Notes winner, loser, Bo7 score, and box score url
         ws.cell(row=i,column=winTeam).value = winner
         ws.cell(row=i,column=lossTeam).value = loser
         ws.cell(row=i,column=awayScore).value = int(aScore)
@@ -278,14 +259,16 @@ def autoScript(sNum = 2, fNum = len(ws['A'])):
         ws.cell(row=i,column=homeWins).value = int(hWins)
         ws.cell(row=i,column=boxScoreURL).value = boxURL
 
+        #Resets home and away team
         acbutton = browser.find_element_by_id('visitorclearbtn')
         acbutton.send_keys(Keys.RETURN)
-
         hcbutton = browser.find_element_by_id('homeclearbtn')
         hcbutton.send_keys(Keys.RETURN)
 
-        print(str(round(float(i/len(ws['A']))*100,2)) + ' percent done.')
+        #Updates on status complete
+        print(str(round(float(i/(len(ws['A']))-sNum)*100,2)) + ' percent done.')
 
+        #Autosaves every 20 games
         if counter % 20 == 0:
             wb.save('dataOutput_' + str(counter / 20) + '.xlsx')
 
