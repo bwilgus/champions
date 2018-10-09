@@ -514,3 +514,11 @@ print(winner)
 
 
 
+
+
+def getGameURL():
+    
+    elems = browser.find_elements_by_xpath("//a[@href]")
+    for elem in elems:
+        if str(elem.get_attribute("href")).find('GameID=') > 0:
+            return elem.get_attribute("href")
