@@ -3,25 +3,76 @@ from requests.exceptions import RequestException
 from contextlib import closing
 from bs4 import BeautifulSoup
 import pdfkit
-import xlrd
+import openpyxl
+from openpyxl import Workbook
+from openpyxl import load_workbook
 import selenium
 from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
 import os
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as ec
+
+
+
+wkbkURL = r'C:\users\wilgu\desktop\blog\Season of Champions\Python\dataOutput_2.0.xlsx'
+wb = load_workbook(wkbkURL)
+ws = wb['data']
+
+sNum = 2
+fNum = 10
+
+gID = 1
+
+atID = 2
+aConf = 3
+aRk = 4
+aName = 5
+aConc = 6
+aYr = 7
+
+
+
+hID = 8
+hConf = 9
+hRk = 10
+hName = 11
+hConc = 12
+hYr = 13
+
+gLoc = 15
+week = 16
+winTeam = 17
+lossTeam = 18
+awayScore = 20
+homeScore = 21
+awayWins = 22
+homeWins = 23
+boxScoreURL = 24
+
 
 #Sets up the PDF saving
 path_wkthmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
 config = pdfkit.configuration(wkhtmltopdf=path_wkthmltopdf)
 
+##gecko = r'C:\\Users\\wilgu\\Desktop\\Blog\\Season of Champions\\Python\\geckodriver'
+##binary = FirefoxBinary(r'C:\Program Files (x86)\Mozilla Firefox\firefox.exe')
+##browser = webdriver.Firefox(firefox_binary=binary, executable_path=gecko+'.exe')
+
 #Establishes browser
 browser = webdriver.Chrome(r'C:\chromedriver\chromedriver.exe')
+##browser = webdriver.Firefox()
+##browser = webdriver.IE(r'C:\Users\wilgu\Desktop\IEDriverServer_Win32_3.14.0\IEDriverServer.exe')
+
+
+##inAway = browser.find_element_by_id("vname")
+##inHome = browser.find_element_by_id("hname")
+##inaYear = browser.find_element_by_id("vseason")
+##inhYear = browser.find_element_by_id("hseason")
 
 #Script that saves website as PDF
 #https://stackoverflow.com/questions/23359083/how-to-convert-webpage-into-pdf-by-using-python
-
-##############################################################################################
-
-
-#This will need a library that writes to excel
 
 
 
@@ -90,7 +141,15 @@ def bSoup(U):
     q3 = gameLog(3)
     q4 = gameLog(4)
     raw_html = simple_get(U)
-    soup = BeautifulSoup(raw_html, 'html.parser')  
+    soup = BeautifulSoup(raw_html, 'html.parser')
+    
+
+def getGameURL():
+    
+    elems = browser.find_elements_by_xpath("//a[@href]")
+    for elem in elems:
+        if str(elem.get_attribute("href")).find('GameID=') > 0:
+            return elem.get_attribute("href")
 
 
 
@@ -105,4 +164,131 @@ def handyScript():
 
 
         
+
+        print(str(i) + ' done')
+
+def autoScript(sNum = 2, fNum = len(ws['A'])):
+    global browser
+    global homeYear
+    global awayYear
+    global getGameURL
+    global counter
+
+    counter = 0
     
+    for i in range(sNum,fNum):
+        browser.get('https://www.whatifsports.com/ncaafb');
+        element = WebDriverWait(browser, 10).until(ec.presence_of_element_located((By.ID, "homebtn")))
+        
+        wk = ws.cell(i, week).value
+        homeTeam = ws.cell(i, hName).value
+        awayTeam = ws.cell(i, aName).value
+        hYear = ws.cell(i, hYr).value
+        aYear = ws.cell(i, aYr).value
+        Loc = ws.cell(i, gLoc).value
+
+##        browser = webdriver.Chrome()
+##        browser.get('http://www.whatifsports.com/ncaafb')
+
+        away = browser.find_element_by_name('vname')
+        home = browser.find_element_by_name('hname')
+        ayear = browser.find_element_by_name('vseason')
+        hyear = browser.find_element_by_name('hseason')
+
+
+
+
+        hWins = 0
+        aWins = 0
+        winner = ""
+
+
+        away.send_keys(awayTeam)
+        ayear.send_keys(aYear)
+        home.send_keys(homeTeam)
+        hyear.send_keys(hYear)
+
+        abutton = browser.find_element_by_id('visitorbtn')
+        abutton.send_keys(Keys.RETURN)
+
+        hbutton = browser.find_element_by_id('homebtn')
+        hbutton.send_keys(Keys.RETURN)
+
+        print(Loc)
+
+        
+
+        if Loc == "H":
+            inLoc = browser.find_element_by_xpath("//input[@value=0]").click()
+        elif Loc == "N":
+            inLoc = browser.find_element_by_xpath("//input[@value=-1]").click()
+        else:
+            print('Loc error on ' + away + ' v. ' + home)
+
+            inLoc.submit()
+
+        while hWins < 4 and aWins < 4:
+            aScore = 0
+            hScore = 0
+
+            playbutton = browser.find_element_by_xpath("//*[@id='playBtn']")
+            playbutton.send_keys(Keys.RETURN)
+            
+
+
+            boxURL = getGameURL()
+            ##
+            ##print(boxURL)
+            ##
+
+
+            bSoup(boxURL)
+
+            s = list(list(list(list(list(list(soup.children)[2])[3])[8])[1])[1])[5]
+            hScore = int(list(s.stripped_strings)[len(list(s.stripped_strings))-1])
+
+            s = list(list(list(list(list(list(soup.children)[2])[3])[8])[1])[1])[3]
+            aScore = int(list(s.stripped_strings)[len(list(s.stripped_strings))-1])
+
+            if int(hScore) > int(aScore):
+                hWins += 1
+            else:
+                aWins += 1
+            
+            if hWins == 4:
+                winner = homeTeam
+                loser = awayTeam
+                
+            if aWins == 4:
+                winner = awayTeam
+                loser = homeTeam
+
+            xbutton = browser.find_element_by_xpath("//*[@id='fancybox-close']")
+            xbutton.click()
+            print(awayTeam + ': ' + str(aScore) + ' ' + homeTeam + ': ' + str(hScore))
+            print('Series: ' + str(aWins) + ' to ' + str(hWins))
+            
+        print(winner + ' wins')
+
+        ws.cell(row=i,column=winTeam).value = winner
+        ws.cell(row=i,column=lossTeam).value = loser
+        ws.cell(row=i,column=awayScore).value = int(aScore)
+        ws.cell(row=i,column=homeScore).value = int(hScore)
+        ws.cell(row=i,column=awayWins).value = int(aWins)
+        ws.cell(row=i,column=homeWins).value = int(hWins)
+        ws.cell(row=i,column=boxScoreURL).value = boxURL
+
+        acbutton = browser.find_element_by_id('visitorclearbtn')
+        acbutton.send_keys(Keys.RETURN)
+
+        hcbutton = browser.find_element_by_id('homeclearbtn')
+        hcbutton.send_keys(Keys.RETURN)
+
+        print(str(round(float(i/len(ws['A']))*100,2)) + ' percent done.')
+
+        if counter % 20 == 0:
+            wb.save('dataOutput_' + str(counter / 20) + '.xlsx')
+
+        counter += 1
+        
+    wb.save('dataOutput.xlsx')
