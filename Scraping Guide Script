@@ -4,6 +4,7 @@ html = list(soup.children)[2]
 list(html.children)
 body = list(html.children)[8]
 
+##Use these to get html to work with
 def washUtah():
     bSoup('https://www.whatifsports.com/ncaafb/boxscore.asp?gameid=9916648&nomenu=1&ad=0')
 
@@ -13,6 +14,7 @@ def boiseTroy():
 
 
 ##############################################
+	##Road Map for Box Score HTML
 
 awayTeam = list(soup.children)[3].get_text()
 homeTeam = list(soup.children)[4].get_text()
