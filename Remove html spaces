@@ -1,0 +1,27 @@
+import pandas as pd
+
+for i in range(len(fgStats['Name'])):
+	fgStats['Name'][i] = fgStats['Name'][i].replace(u'\xa0', u' ')
+
+fgStats.to_csv('')
+
+for i in range(len(passStats['Name'])):
+	passStats['Name'][i] = passStats['Name'][i].replace(u'\xa0', u' ')
+
+fgStats.to_csv('')
+
+for i in range(len(rushStats['Name'])):
+	rushStats['Name'][i] = rushStats['Name'][i].replace(u'\xa0', u' ')
+
+fgStats.to_csv('')
+
+for i in range(len(recStats['Name'])):
+	recStats['Name'][i] = recStats['Name'][i].replace(u'\xa0', u' ')
+
+fgStats.to_csv('')
+
+for i in range(len(defStats['Name'])):
+	defStats['Name'][i] = defStats['Name'][i].replace(u'\xa0', u' ')
+
+
+fgStats.to_csv('')
