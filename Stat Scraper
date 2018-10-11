@@ -9,7 +9,7 @@ import pandas as pd
 import numpy as np
 
 wk = 0
-wb = load_workbook(r'C:\users\wilgj\desktop\python crap\dataOutput_3.0.xlsx')
+wb = load_workbook(r'C:\users\wilgu\desktop\blog\season of champions\python\dataOutputFinal.xlsx')
 ws = wb['data']
 
 
@@ -34,39 +34,51 @@ fgStats = pd.DataFrame([], columns = fgTitle)
 
 statsAdd = []
 
+tdHeaders = ['team', 'week', 'opp', 'fd allowed', 'rfd allowed', 'pfd allowed', 'penfd allowed', '3dc allowed', '3da against', '4dc allowed', '4da against', 'rushatt allowed', 'rYds allowed', 'avgrush allowed', 'comp allowed', 'passatt allowed', \
+                           'ints taken', 'sacks made', 'sackyds made', 'ff', 'fr', 'kr allowed', 'kravg allowed', 'pr allowed', 'pravg allowed']
+toHeaders = ['team', 'week', 'opp', 'fd', 'rfd', 'pfd', 'penfd', '3dc', '3da', '4dc', '4da', 'rushatt', 'rYds', 'avgrush', 'comp', 'passatt',\
+                           'intthrown', 'sack', 'sackyds', 'fumbles', 'flost', 'punt', 'pavg', 'kr', 'kravg', 'pr', 'pravg', 'pens', 'penyds', 'top']
+
 
 ###
 
 #Away Offensive Stats
 AOS = pd.DataFrame([],
-                columns = ['team', 'week', 'opp', 'fd', 'rfd', 'pfd', 'penfd', '3de', '4de', 'rushatt', 'rYds', 'avgrush', 'comp', 'passatt',\
-                           'intthrown', 'sack', 'sackyds', 'fumbles', 'flost', 'punt', 'pavg', 'kr', 'kravg', 'pr', 'pravg', 'pens', 'penyds', 'top']
+                columns = toHeaders
                          )
 AOA = []
 
 #Away Defensive Stats                            
 ADS = pd.DataFrame([],
-                columns = ['team', 'week', 'opp', 'fd allowed', 'rfd allowed', 'pfd allowed', 'penfd allowed', '3de allowed', '4de allowed', 'rushatt allowed', 'rYds allowed', 'avgrush allowed', 'comp allowed', 'passatt allowed', \
-                           'ints taken', 'sacks made', 'sackyds made', 'ff', 'fr', 'kr allowed', 'kravg allowed', 'pr allowed', 'pravg allowed']
-                            )
+                columns = tdHeaders
+                   )
 ADA=[]
 
 #Home Offensive Stats
 HOS = pd.DataFrame([],
-                columns = ['team', 'week', 'opp', 'fd', 'rfd', 'pfd', 'penfd', '3de', '4de', 'rushatt', 'rYds', 'avgrush', 'comp', 'passatt',\
-                           'intthrown', 'sack', 'sackyds', 'fumbles', 'flost', 'punt', 'pavg', 'kr', 'kravg', 'pr', 'pravg', 'pens', 'penyds', 'top']
-                         )
+                columns = toHeaders
+                   )
 HOA=[]
 
 #Home Defensive Stats                            
 HDS = pd.DataFrame([],
-                columns = ['team', 'week', 'opp', 'fd allowed', 'rfd allowed', 'pfd allowed', 'penfd allowed', '3de allowed', '4de allowed', 'rushatt allowed', 'rYds allowed', 'avgrush allowed', 'comp allowed', 'passatt allowed', \
-                           'ints taken', 'sacks made', 'sackyds made', 'ff', 'fr', 'kr allowed', 'kravg allowed', 'pr allowed', 'pravg allowed']
-                            )
+                columns = tdHeaders
+                   )
 HDA=[]
 
 ####
 
+#Team Offensive Stats
+TOS = pd.DataFrame([],
+                columns = toHeaders
+                   )
+HOA=[]
+
+#Team Defensive Stats                            
+TDS = pd.DataFrame([],
+                columns = tdHeaders
+                   )
+HDA=[]
 
 #### Some notes
 #    df.describe() gives some interesting stats, where df=pd.read_csv('sample.csv')
@@ -193,14 +205,14 @@ def grabStats(wk):
     ###Rush
     global home, away, ars, hrs, arecs, hrecs, aps, hps, ads, hds, afs, hfs
     
-    global a1d, a1dr, a1dp, a1dpen, a3de, a4de, aRA, aRY, aAvgR, aPC, aPA, aIT, aSck, aSckYds\
+    global a1d, a1dr, a1dp, a1dpen, a3dc, a3da, a4dc, a4da, aRA, aRY, aAvgR, aPC, aPA, aIT, aSck, aSckYds\
            , aFum, aFL, aPunt, aPAvg, aKR, aKRAvg, aPR, aPRAvg, aPens, aPenYds, aTOP, h1d, h1dr\
-           , h1dp, h1dpen, h3de, h4de, hRA, hRY, hAvgR, hPC, hPA, hIT, hSck, hSckYds, hFum, hFL\
+           , h1dp, h1dpen, h3dc, h3da, h4dc, h4da, hRA, hRY, hAvgR, hPC, hPA, hIT, hSck, hSckYds, hFum, hFL\
            , hPunt, hPAvg, hKR, hKRAvg, hPR, hPRAvg, hPens, hPenYds, hTOP, apRating, hpRating, pRating\
            ,prComp, prAtt, prINT, prTD, prYds
     
     global rushStats, passStats, recStats, defStats, fgStats, statsAdd
-    global AOS, ADS, AOA, ADA
+    global AOS, ADS, AOA, ADA, TDS, TOS
     global HOS, HDS, HOA, HDA
 
     home = list(soup.children)[4].get_text()[5:]
@@ -398,8 +410,10 @@ def grabStats(wk):
     a1dr = list(list(soup.children)[8].stripped_strings)[1]
     a1dp = list(list(soup.children)[10].stripped_strings)[1]
     a1dpen = list(list(soup.children)[12].stripped_strings)[1]
-    a3de = list(list(soup.children)[14].stripped_strings)[1]
-    a4de = list(list(soup.children)[16].stripped_strings)[1]
+    a3dc = str(list(list(soup.children)[14].stripped_strings)[1])[:str(list(list(soup.children)[14].stripped_strings)[1]).find("/")]
+    a3da = str(list(list(soup.children)[14].stripped_strings)[1])[str(list(list(soup.children)[14].stripped_strings)[1]).find("/")+1:]
+    a4dc = str(list(list(soup.children)[16].stripped_strings)[1])[:str(list(list(soup.children)[16].stripped_strings)[1]).find("/")]
+    a4da = str(list(list(soup.children)[16].stripped_strings)[1])[str(list(list(soup.children)[16].stripped_strings)[1]).find("/")+1:]
     aRA = str(list(list(soup.children)[18].stripped_strings)[1])[:str(list(list(soup.children)[18].stripped_strings)[1]).find('-')]
     aRY = str(list(list(soup.children)[18].stripped_strings)[1])[str(list(list(soup.children)[18].stripped_strings)[1]).find('-')+1:]
     aAvgR = str(list(list(soup.children)[20].stripped_strings)[1])[:str(list(list(soup.children)[20].stripped_strings)[1]).find("-")]
@@ -427,8 +441,10 @@ def grabStats(wk):
     h1dr = list(list(soup.children)[8].stripped_strings)[2]
     h1dp = list(list(soup.children)[10].stripped_strings)[2]
     h1dpen = list(list(soup.children)[12].stripped_strings)[2]
-    h3de = list(list(soup.children)[14].stripped_strings)[2]
-    h4de = list(list(soup.children)[16].stripped_strings)[2]
+    h3dc = str(list(list(soup.children)[14].stripped_strings)[2])[:str(list(list(soup.children)[14].stripped_strings)[2]).find("/")]
+    h3da = str(list(list(soup.children)[14].stripped_strings)[2])[str(list(list(soup.children)[14].stripped_strings)[2]).find("/")+1:]
+    h4dc = str(list(list(soup.children)[16].stripped_strings)[2])[:str(list(list(soup.children)[16].stripped_strings)[2]).find("/")]
+    h4da = str(list(list(soup.children)[16].stripped_strings)[2])[str(list(list(soup.children)[16].stripped_strings)[2]).find("/")+1:]
     hRA = str(list(list(soup.children)[18].stripped_strings)[2])[:str(list(list(soup.children)[18].stripped_strings)[2]).find('-')]
     hRY = str(list(list(soup.children)[18].stripped_strings)[2])[str(list(list(soup.children)[18].stripped_strings)[2]).find('-')+1:]
     hAvgR = str(list(list(soup.children)[20].stripped_strings)[2])[:str(list(list(soup.children)[20].stripped_strings)[1]).find("-")]
@@ -450,14 +466,33 @@ def grabStats(wk):
     hPenYds = str(list(list(soup.children)[36].stripped_strings)[2])[str(list(list(soup.children)[36].stripped_strings)[2]).find('-')+1:]
     hTOP = list(list(soup.children)[38].stripped_strings)[2]
 
-    AOA = [home, wk, away, a1d, a1dr, a1dp, a1dpen, a3de, a4de, aRA, aRY, aAvgR, aPC, aPA, aIT, aSck, aSckYds\
+
+    AOA = [away, wk, home, a1d, a1dr, a1dp, a1dpen, a3dc, a3da, a4dc, a4da, aRA, aRY, aAvgR, aPC, aPA, aIT, aSck, aSckYds\
            , aFum, aFL, aPunt, aPAvg, aKR, aKRAvg, aPR, aPRAvg, aPens, aPenYds, aTOP]
 
 
-    HOA = [home, wk, away, a1d, a1dr, a1dp, a1dpen, a3de, a4de, aRA, aRY, aAvgR, aPC, aPA, aIT, aSck, aSckYds\
-           , aFum, aFL, aPunt, aPAvg, aKR, aKRAvg, aPR, aPRAvg, aPens, aPenYds, aTOP]
+    HOA = [home, wk, away, h1d, h1dr, h1dp, h1dpen, h3dc, h3da, h4dc, h4da, hRA, hRY, hAvgR, hPC, hPA, hIT, hSck, hSckYds\
+           , hFum, hFL, hPunt, hPAvg, hKR, hKRAvg, hPR, hPRAvg, hPens, hPenYds, hTOP]
 
-    
+    ADA = [away, wk, home, h1d, h1dr, h1dp, h1dpen, h3dc, h3da, h4dc, h4da, hRA, hRY, hAvgR, hPC, hPA, hIT, hSck, hSckYds, hFum\
+           , hFL, hKR, hKRAvg, hPR, hPRAvg]
+
+    HDA = [home, wk, away, a1d, a1dr, a1dp, a1dpen, a3dc, a3da, a4dc, a4da, aRA, aRY, aAvgR, aPC, aPA, aIT, aSck, aSckYds, aFum\
+           , aFL, aKR, aKRAvg, aPR, aPRAvg]
+
+##    print(len(AOA))
+##    print(len(aosCol))
+
+    TOS.loc[len(TOS)] = AOA
+    TOS.loc[len(TOS)] = HOA
+    TDS.loc[len(TDS)] = ADA
+    TDS.loc[len(TDS)] = HDA
+
+
+    AOA = []
+    HOA = []
+    ADA = []
+    HDA = []    
     
 
 
@@ -481,8 +516,10 @@ def statScrape(sNum=1, fNum=len(ws['x'])):
             grabStats(wk)
             print(str(i/(fNum-sNum+1)*100) + ' percent done')
 
-    passStats.to_csv(r'C:\users\wilgj\desktop\python crap\csvs\passStats.csv')
-    rushStats.to_csv(r'C:\users\wilgj\desktop\python crap\csvs\rushStats.csv')
-    recStats.to_csv(r'C:\users\wilgj\desktop\python crap\csvs\recStats.csv')
-    defStats.to_csv(r'C:\users\wilgj\desktop\python crap\csvs\defStats.csv')
-    fgStats.to_csv(r'C:\users\wilgj\desktop\python crap\csvs\fgStats.csv')
+    passStats.to_csv(r'C:\users\wilgu\desktop\blog\season of champions\python\passStats.csv')
+    rushStats.to_csv(r'C:\users\wilgu\desktop\blog\season of champions\python\rushStats.csv')
+    recStats.to_csv(r'C:\users\wilgu\desktop\blog\season of champions\python\recStats.csv')
+    defStats.to_csv(r'C:\users\wilgu\desktop\blog\season of champions\python\defStats.csv')
+    fgStats.to_csv(r'C:\users\wilgu\desktop\blog\season of champions\python\fgStats.csv')
+    TOS.to_csv(r'C:\users\wilgu\desktop\blog\season of champions\python\csvs\toStats.csv')
+    TDS.to_csv(r'C:\users\wilgu\desktop\blog\season of champions\python\csvs\tdStats.csv')
