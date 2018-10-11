@@ -1,0 +1,157 @@
+import pandas as pd
+import numpy as np
+
+
+
+def passerRating(pYds, pTD, pComp, pATT, pINT):
+    rating = ((8.4*pYds)+(330*pTD)+(100*pComp)-(200*pINT))/pATT*1.0
+    return(round(rating,2))
+
+teamDic = {}
+
+    
+
+
+passStats = pd.read_csv(r'C:\users\wilgj\desktop\python crap\csvs\passStats.csv', index_col=0)
+rushStats = pd.read_csv(r'C:\users\wilgj\desktop\python crap\csvs\rushStats.csv', index_col=0)
+recStats = pd.read_csv(r'C:\users\wilgj\desktop\python crap\csvs\recStats.csv', index_col=0)
+defStats = pd.read_csv(r'C:\users\wilgj\desktop\python crap\csvs\defStats.csv', index_col=0)
+fgStats = pd.read_csv(r'C:\users\wilgj\desktop\python crap\csvs\fgStats.csv', index_col=0)
+
+ps = passStats.groupby('Name').sum()
+ps = ps.drop(columns=['Week','Rating'])
+ps['Rating'] = passerRating(ps['Yds'], ps['TD'], ps['Comp'], ps['Att'], ps['INT'])
+
+rus = rushStats.groupby('Name').sum()
+rus = rus.drop(columns=['Week'])
+
+res = recStats.groupby('Name').sum()
+res = res.drop(columns=['Week'])
+
+ds = defStats.groupby('Name').sum()
+ds = ds.drop(columns=['Week'])
+
+##fgStats['<19 made'] = ''
+##fgStats['<19 attempt'] = ''
+##fgStats['20-29 made'] = ''
+##fgStats['20-29 attempt'] = ''
+##fgStats['30-39 made'] = ''
+##fgStats['30-39 attempt'] = ''
+##fgStats['40-49 made'] = ''
+##fgStats['40-49 attempt'] = ''
+##fgStats['50+ made'] = ''
+##fgStats['50+ attempt'] = ''
+
+def fg19(fgstring):
+    m = 0
+
+    if fgstring != '-':
+        fNo = fgstring.count(',') + 1
+        for x in range(fNo):
+            sNo = x * 3
+            eNo = sNo + 2
+            fg = int(fgstring[sNo:eNo])
+            if fg < 20:
+                m += 1
+
+    return(m)
+
+
+def fg2029(fgstring):
+    m = 0
+
+    if fgstring != '-':
+        fNo = fgstring.count(',') + 1
+        for x in range(fNo):
+            sNo = x * 3
+            eNo = sNo + 2
+            fg = int(fgstring[sNo:eNo])
+            if fg < 30 and fg >= 20:
+                m += 1
+
+    return(m)
+
+def fg3039(fgstring):
+    m = 0
+
+    if fgstring != '-':
+        fNo = fgstring.count(',') + 1
+        for x in range(fNo):
+            sNo = x * 3
+            eNo = sNo + 2
+            fg = int(fgstring[sNo:eNo])
+            if fg < 40 and fg >= 30:
+                m += 1
+
+    return(m)
+
+def fg4049(fgstring):
+    m = 0
+
+    if fgstring != '-':
+        fNo = fgstring.count(',') + 1
+        for x in range(fNo):
+            sNo = x * 3
+            eNo = sNo + 2
+            fg = int(fgstring[sNo:eNo])
+            if fg < 50 and fg >= 40:
+                m += 1
+
+    return(m)
+
+def fg50(fgstring):
+    m = 0
+
+    if fgstring != '-':
+        fNo = fgstring.count(',') + 1
+        for x in range(fNo):
+            sNo = x * 3
+            eNo = sNo + 2
+            fg = int(fgstring[sNo:eNo])
+            if fg > 49:
+                m += 1
+
+    return(m)
+
+def fgLong(fg):
+    m = 0
+
+    if fg != '-':
+        fNo = fg.count(',') + 1
+        for x in range(fNo):
+            sNo = x * 3
+            eNo = sNo + 2
+            fgl = int(fg[sNo:eNo])
+            if fgl > m:
+                m = fgl
+
+    return(m)
+
+
+def returnIndex(series, value):
+    for i in range(len(series)):
+        if series[i] == value:
+            return(i)
+            break
+    
+##for i in range(len(fgStats['Name'].unique())):
+##    teamDic[list(fgStats['Name'].unique())[i]
+
+fgStats['<19 Made'] = fgStats['Made'].map(lambda x: fg19(x))
+fgStats['<19 Atts'] = fgStats['Missed'].map(lambda x: fg19(x)) + fgStats['Made'].map(lambda x: fg19(x))
+fgStats['20-29 Made'] = fgStats['Made'].map(lambda x: fg2029(x))
+fgStats['20-29 Atts'] = fgStats['Missed'].map(lambda x: fg2029(x)) + fgStats['Made'].map(lambda x: fg2029(x))
+fgStats['30-39 Made'] = fgStats['Made'].map(lambda x: fg3039(x))
+fgStats['30-39 Atts'] = fgStats['Missed'].map(lambda x: fg3039(x)) + fgStats['Made'].map(lambda x: fg3039(x))
+fgStats['40-49 Made'] = fgStats['Made'].map(lambda x: fg4049(x))
+fgStats['40-49 Atts'] = fgStats['Missed'].map(lambda x: fg4049(x)) + fgStats['Made'].map(lambda x: fg4049(x))
+fgStats['50+ Made'] = fgStats['Made'].map(lambda x: fg50(x))
+fgStats['50+ Atts'] = fgStats['Missed'].map(lambda x: fg50(x)) + fgStats['Made'].map(lambda x: fg50(x))
+fgStats['Long'] = fgStats['Made'].map(lambda x: fgLong(x))
+
+
+
+
+fgs = fgStats.groupby('Name').sum()
+fgStats = fgStats.drop(columns=['Made','Missed'])
+fgs = fgs.drop(columns=['Week'])
