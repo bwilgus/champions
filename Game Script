@@ -31,25 +31,25 @@ ws = wb.active
 #These variables denote which columns are which number.
 ## A = 1, B = 2, C = 3, etc.
 
-##gID = 1
+gID = 1
 
-##atID = 2
-##aConf = 3
-##aRk = 4
-##aName = 10
-##aConc = 6
-##aYr = 11
+atID = 2
+aConf = 3
+aRk = 4
+aName = 5
+aConc = 6
+aYr = 7
 
 
 
-##hID = 8
-##hConf = 9
-##hRk = 10
-##hName = 6
-##hConc = 12
-##hYr = 7
+hID = 8
+hConf = 9
+hRk = 10
+hName = 11
+hConc = 12
+hYr = 13
 
-##gLoc = 13
+gLoc = 15
 week = 16
 winTeam = 17
 lossTeam = 18
