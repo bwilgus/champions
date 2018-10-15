@@ -1,46 +1,15 @@
 import pandas as pd
 import numpy as np
+from matplotlib import pyplot as plt
+import seaborn as sb
 
+############################################################################
 
+    ## My Functions
 
 def passerRating(pYds, pTD, pComp, pATT, pINT):
     rating = ((8.4*pYds)+(330*pTD)+(100*pComp)-(200*pINT))/pATT*1.0
     return(round(rating,2))
-
-teamDic = {}
-
-    
-
-
-passStats = pd.read_csv(r'C:\users\wilgj\desktop\python crap\csvs\passStats.csv', index_col=0)
-rushStats = pd.read_csv(r'C:\users\wilgj\desktop\python crap\csvs\rushStats.csv', index_col=0)
-recStats = pd.read_csv(r'C:\users\wilgj\desktop\python crap\csvs\recStats.csv', index_col=0)
-defStats = pd.read_csv(r'C:\users\wilgj\desktop\python crap\csvs\defStats.csv', index_col=0)
-fgStats = pd.read_csv(r'C:\users\wilgj\desktop\python crap\csvs\fgStats.csv', index_col=0)
-
-ps = passStats.groupby('Name').sum()
-ps = ps.drop(columns=['Week','Rating'])
-ps['Rating'] = passerRating(ps['Yds'], ps['TD'], ps['Comp'], ps['Att'], ps['INT'])
-
-rus = rushStats.groupby('Name').sum()
-rus = rus.drop(columns=['Week'])
-
-res = recStats.groupby('Name').sum()
-res = res.drop(columns=['Week'])
-
-ds = defStats.groupby('Name').sum()
-ds = ds.drop(columns=['Week'])
-
-##fgStats['<19 made'] = ''
-##fgStats['<19 attempt'] = ''
-##fgStats['20-29 made'] = ''
-##fgStats['20-29 attempt'] = ''
-##fgStats['30-39 made'] = ''
-##fgStats['30-39 attempt'] = ''
-##fgStats['40-49 made'] = ''
-##fgStats['40-49 attempt'] = ''
-##fgStats['50+ made'] = ''
-##fgStats['50+ attempt'] = ''
 
 def fg19(fgstring):
     m = 0
@@ -133,10 +102,49 @@ def returnIndex(series, value):
         if series[i] == value:
             return(i)
             break
-    
-##for i in range(len(fgStats['Name'].unique())):
-##    teamDic[list(fgStats['Name'].unique())[i]
 
+def madeMiss(colA, colB, colC, colD, colE):
+    return(colA+colB+colC+colD+colE)
+
+def fgLong(wkName):
+    global fgl
+    fgl = fgStats[fgStats.Name == wkName]
+    return(np.max(fgl.Long))
+                
+    
+def findTeam(sdf, wkName):
+    global tmn
+    tmn = sdf[sdf.Name == wkName]
+    tmn = tmn.reset_index()
+    return(tmn.Team[0])
+
+############################################################################
+
+passStats = pd.read_csv(r'C:\users\wilgj\desktop\python crap\csvs\passStats.csv', index_col=0)
+rushStats = pd.read_csv(r'C:\users\wilgj\desktop\python crap\csvs\rushStats.csv', index_col=0)
+recStats = pd.read_csv(r'C:\users\wilgj\desktop\python crap\csvs\recStats.csv', index_col=0)
+defStats = pd.read_csv(r'C:\users\wilgj\desktop\python crap\csvs\defStats.csv', index_col=0)
+fgStats = pd.read_csv(r'C:\users\wilgj\desktop\python crap\csvs\fgStats.csv', index_col=0)
+
+ps = passStats.groupby('Name').sum()
+ps = ps.drop(columns=['Week','Rating'])
+ps['Rating'] = passerRating(ps['Yds'], ps['TD'], ps['Comp'], ps['Att'], ps['INT'])
+
+
+rus = rushStats.groupby('Name').sum()
+rus = rus.drop(columns=['Week'])
+
+
+res = recStats.groupby('Name').sum()
+res = res.drop(columns=['Week'])
+
+
+ds = defStats.groupby('Name').sum()
+ds = ds.drop(columns=['Week'])
+
+
+
+#Creates count columns for field goals by range
 fgStats['<19 Made'] = fgStats['Made'].map(lambda x: fg19(x))
 fgStats['<19 Atts'] = fgStats['Missed'].map(lambda x: fg19(x)) + fgStats['Made'].map(lambda x: fg19(x))
 fgStats['20-29 Made'] = fgStats['Made'].map(lambda x: fg2029(x))
@@ -149,9 +157,67 @@ fgStats['50+ Made'] = fgStats['Made'].map(lambda x: fg50(x))
 fgStats['50+ Atts'] = fgStats['Missed'].map(lambda x: fg50(x)) + fgStats['Made'].map(lambda x: fg50(x))
 fgStats['Long'] = fgStats['Made'].map(lambda x: fgLong(x))
 
+#Removes the existing Made/Missed columns
+fgStats = fgStats.drop(columns=['Made','Missed'])
+
+#Creates Made, Attempts (Made + Missed), and FG%
+fgStats['Made'] = madeMiss(fgStats['<19 Made'], fgStats['20-29 Made'], fgStats['30-39 Made'], fgStats['40-49 Made'], fgStats['50+ Made'])
+fgStats['Atts'] = madeMiss(fgStats['<19 Atts'], fgStats['20-29 Atts'], fgStats['30-39 Atts'], fgStats['40-49 Atts'], fgStats['50+ Atts'])
+fgStats['FG%'] = round(fgStats['Made']/fgStats['Atts']*100.00,2)
 
 
 
 fgs = fgStats.groupby('Name').sum()
-fgStats = fgStats.drop(columns=['Made','Missed'])
-fgs = fgs.drop(columns=['Week'])
+
+
+
+#Passing Season Stat Table Transformations
+pas['Team'] = pas['Name'].map(lambda x: findTeam(passStats, x))
+cols = list(pas)
+cols.insert(1, cols.pop(cols.index('Team')))
+
+pas = pas.ix[:, cols]
+
+#Rushing Season Stat Table Transformations
+rus['Team'] = rus['Name'].map(lambda x: findTeam(rushStats, x))
+cols = list(rus)
+cols.insert(1, cols.pop(cols.index('Team')))
+
+rus = rus.ix[:, cols]
+
+#Receiving Season Stat Table Transformations
+res['Team'] = res['Name'].map(lambda x: findTeam(recStats, x))
+cols = list(res)
+cols.insert(1, cols.pop(cols.index('Team')))
+
+res = res.ix[:, cols]
+
+#Defensive Season Stat Table Transformations
+ds['Team'] = ds['Name'].map(lambda x: findTeam(defStats, x))
+cols = list(ds)
+cols.insert(1, cols.pop(cols.index('Team')))
+
+ds = ds.ix[:, cols]
+
+#FG Season Stat Table Transformations
+fgs = fgs.drop(columns=['Week','Long','FG%'])
+
+fgs['Long'] = fgStats['Name'].map(lambda x: fgLong(x))
+fgs['Team'] = fgs['Name'].map(lambda x: findTeam(fgStats, x))
+
+cols = list(fgs)
+cols.insert(1, cols.pop(cols.index('Team')))
+cols.insert(2, cols.pop(cols.index('Made')))
+cols.insert(3, cols.pop(cols.index('Atts')))
+cols.insert(4, cols.pop(cols.index('FG%')))
+cols.insert(5, cols.pop(cols.index('Long')))
+fgs = fgs.ix[:, cols]
+
+
+
+#Saves to CSVs)
+ps.to_csv(r'C:\users\wilgj\desktop\python crap\csvs\passSeason.csv')
+rus.to_csv(r'C:\users\wilgj\desktop\python crap\csvs\rushSeason.csv')
+res.to_csv(r'C:\users\wilgj\desktop\python crap\csvs\recSeason.csv')
+ds.to_csv(r'C:\users\wilgj\desktop\python crap\csvs\defSeason.csv')
+fgs.to_csv(r'C:\users\wilgj\desktop\python crap\csvs\fgSeason.csv')
