@@ -1,3 +1,7 @@
+To-Do List: 
+- Make season stat csvs for each grouping
+- use findTeam() to add team names to Season Stat csvs
+
 Wishlist:
 
 - Look up punters, punt returners, and kick returners to attribute Punt, Punt Return, and Kick Return Yardage to someone
