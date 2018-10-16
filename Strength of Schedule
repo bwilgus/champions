@@ -1,0 +1,57 @@
+import pandas as pd
+
+wsData = pd.read_excel(r'C:\Users\wilgj\Desktop\python crap\dataOutputFinal.xlsx', sheet_name='data')
+WL = pd.read_excel(r'C:\Users\wilgj\Desktop\python crap\dataOutputFinal.xlsx', sheet_name='WL')
+
+def SOS(tmName):
+    global wsData
+    global opp, oppW, oppL, oppWL
+    global opp2, opp2W, opp2L, opp2WL
+    global s
+
+    oppW = 0
+    oppL = 0
+    oppWL = 0
+    
+    opp2W = 0
+    opp2L = 0
+    opp2WL = 0
+
+    opp = []
+    opp2 = []
+    
+    
+    for i in range(len(wsData.Away)):
+        if wsData.Away[i] == tmName:
+            opp.append(wsData.Home[i])
+
+        if wsData.Home[i] == tmName:
+            opp.append(wsData.Away[i])
+
+    for x in range(len(opp)):
+        for i in range(len(wsData.Away)):
+            if wsData.Away[i] == opp[x]:
+                opp2.append(wsData.Home[i])
+
+            if wsData.Home[i] == opp[x]:
+                opp2.append(wsData.Away[i])
+
+    for i in range(len(opp)):
+        for x in range(len(WL.Name)):
+            if opp[i] == WL.Name[x]:
+                oppW += WL.Wins[x]
+                oppL += WL.Losses[x]
+                
+    oppWL = 1.00*oppW/(oppW + oppL)
+
+    for i in range(len(opp2)):
+        for x in range(len(WL.Name)):
+            if opp2[i] == WL.Name[x]:
+                opp2W += WL.Wins[x]
+                opp2L += WL.Losses[x]
+    
+    opp2WL = 1.00*opp2W/(opp2W + opp2L)
+
+    s = ((2*oppWL)+opp2WL)/3
+
+    return(s)
