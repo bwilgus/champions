@@ -21,7 +21,7 @@ from selenium.webdriver.support import expected_conditions as ec
 
         ##Workbook Setup
 
-wkbkURL = r'C:\users\wilgj\desktop\script test.xlsx'
+wkbkURL = r'C:\Users\wilgj\Desktop\python crap\dataOutputFresh.xlsx'
 wb = load_workbook(wkbkURL)
 ws = wb.active
 
@@ -134,8 +134,9 @@ def getGameURL():
 
 #Establishes browser
 browser = webdriver.Chrome()
+closeTab = webdriver.Chrome()
 
-
+print('Remember to log onto google and whatifsports to save box scores')
 
 """
 autoScript(sNum, fNum)
@@ -258,6 +259,9 @@ def autoScript(sNum = 2, fNum = len(ws['A'])):
         ws.cell(row=i,column=awayWins).value = int(aWins)
         ws.cell(row=i,column=homeWins).value = int(hWins)
         ws.cell(row=i,column=boxScoreURL).value = boxURL
+        gameID = str(q[(q.find('gameid=')+7):q.find('&nomenu')])
+
+        closeTab.get('https://www.whatifsports.com/locker/saved_games_add.asp?gameid=' + gameID + '&gametypeid=6')
 
         #Resets home and away team
         acbutton = browser.find_element_by_id('visitorclearbtn')
@@ -275,3 +279,4 @@ def autoScript(sNum = 2, fNum = len(ws['A'])):
         counter += 1
         
     wb.save('dataOutput.xlsx')
+    closeTab.close()
