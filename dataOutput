@@ -1,0 +1,4 @@
+import pandas as pd
+
+wsData = pd.read_excel(r'C:\users\wilgu\desktop\blog\season of champions\python\dataOutputFinal.xlsx', sheet_name='data')
+s1 = pd.read_excel(r'C:\users\wilgu\desktop\blog\season of champions\python\dataOutputFinal.xlsx', sheet_name='WL')
