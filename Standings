@@ -1,0 +1,60 @@
+import pandas as pd
+
+def tmWin(tm):
+    return(len(wsData[(wsData.Win == tm)]))
+            
+def tmLoss(tm):
+    return(len(wsData[(wsData.Loss == tm)]))
+
+
+def conWin(tm):
+    return(len(wsData[(wsData.Win == tm) & (wsData['Conference Game?'] == True)]))
+            
+def conLoss(tm):
+    return(len(wsData[(wsData.Loss == tm) & (wsData['Conference Game?'] == True)]))
+
+
+wsData = pd.read_excel(r'C:\users\wilgu\desktop\blog\season of champions\python\dataOutputFinal.xlsx', sheet_name='data')
+WL = pd.read_excel(r'C:\users\wilgu\desktop\blog\season of champions\python\dataOutputFinal.xlsx', sheet_name='WL')
+
+ACC = WL[WL.Conference == 'ACC']
+ACC = ACC.reset_index()
+
+B10 = WL[WL.Conference == 'Big 10']
+B10 = B10.reset_index()
+
+B12 = WL[WL.Conference == 'Big 12']
+B12 = B12.reset_index()
+
+P12 = WL[WL.Conference == 'Pac-12']
+P12 = P12.reset_index()
+
+SEC = WL[WL.Conference == 'SEC']
+SEC = SEC.reset_index()
+
+AAC = WL[WL.Conference == 'AAC']
+AAC = AAC.reset_index()
+
+CUSA = WL[WL.Conference == 'CUSA']
+CUSA = CUSA.reset_index()
+
+MAC = WL[WL.Conference == 'MAC']
+MAC = MAC.reset_index()
+
+MWC = WL[WL.Conference == 'Mountain West']
+MWC = MWC.reset_index()
+
+SBC = WL[WL.Conference == 'Sun Belt']
+SBC = SBC.reset_index()
+
+cons = [AAC, ACC, B10, B12, CUSA, MAC, MWC, P12, SBC, SEC]
+
+for i in range(len(cons)):
+    cons[i]['Wins'] = cons[i]['Team'].map(lambda x: tmWin(x))
+    cons[i]['Losses'] = cons[i]['Team'].map(lambda x: tmLoss(x))
+
+
+for i in range(len(cons)):
+    cons[i]['Conf Wins'] = cons[i]['Team'].map(lambda x: conWin(x))
+    cons[i]['Conf Losses'] = cons[i]['Team'].map(lambda x: conLoss(x))
+
