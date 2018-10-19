@@ -1,0 +1,17 @@
+import pandas as pd
+import numpy as np
+from matplotlib import pyplot as plt
+import seaborn as sb
+
+passStats = pd.read_csv(r'C:\Users\wilgu\Desktop\Blog\Season of Champions\Python\csvs\passStats.csv')
+rushStats = pd.read_csv(r'C:\Users\wilgu\Desktop\Blog\Season of Champions\Python\csvs\rushStats.csv')
+recStats = pd.read_csv(r'C:\Users\wilgu\Desktop\Blog\Season of Champions\Python\csvs\recStats.csv')
+defStats = pd.read_csv(r'C:\Users\wilgu\Desktop\Blog\Season of Champions\Python\csvs\defStats.csv')
+fgStats = pd.read_csv(r'C:\Users\wilgu\Desktop\Blog\Season of Champions\Python\csvs\fgStats.csv')
+
+ps = pd.read_csv(r'C:\Users\wilgu\Desktop\Blog\Season of Champions\Python\csvs\test\passSeason.csv')
+rus = pd.read_csv(r'C:\Users\wilgu\Desktop\Blog\Season of Champions\Python\csvs\test\rushSeason.csv')
+res = pd.read_csv(r'C:\Users\wilgu\Desktop\Blog\Season of Champions\Python\csvs\test\recSeason.csv')
+ds = pd.read_csv(r'C:\Users\wilgu\Desktop\Blog\Season of Champions\Python\csvs\test\defSeason.csv')
+fgs = pd.read_csv(r'C:\Users\wilgu\Desktop\Blog\Season of Champions\Python\csvs\test\fgSeason.csv')
+
