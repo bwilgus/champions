@@ -106,7 +106,7 @@ def returnIndex(series, value):
 def madeMiss(colA, colB, colC, colD, colE):
     return(colA+colB+colC+colD+colE)
 
-def fgLong(wkName):
+def fgSeaLong(wkName):
     global fgl
     fgl = fgStats[fgStats.Name == wkName]
     return(np.max(fgl.Long))
@@ -118,30 +118,47 @@ def findTeam(sdf, wkName):
     tmn = tmn.reset_index()
     return(tmn.Team[0])
 
+def htmlSpace(pd):
+    pd.replace(u'\xa0',u' ', regex=True, inplace=True)
+
 ############################################################################
 
-passStats = pd.read_csv(r'C:\users\wilgj\desktop\python crap\csvs\passStats.csv', index_col=0)
-rushStats = pd.read_csv(r'C:\users\wilgj\desktop\python crap\csvs\rushStats.csv', index_col=0)
-recStats = pd.read_csv(r'C:\users\wilgj\desktop\python crap\csvs\recStats.csv', index_col=0)
-defStats = pd.read_csv(r'C:\users\wilgj\desktop\python crap\csvs\defStats.csv', index_col=0)
-fgStats = pd.read_csv(r'C:\users\wilgj\desktop\python crap\csvs\fgStats.csv', index_col=0)
+passStats = pd.read_csv(r'C:\Users\wilgu\Desktop\Blog\Season of Champions\Python\csvs\passStats.csv')
+rushStats = pd.read_csv(r'C:\Users\wilgu\Desktop\Blog\Season of Champions\Python\csvs\rushStats.csv')
+recStats = pd.read_csv(r'C:\Users\wilgu\Desktop\Blog\Season of Champions\Python\csvs\recStats.csv')
+defStats = pd.read_csv(r'C:\Users\wilgu\Desktop\Blog\Season of Champions\Python\csvs\defStats.csv')
+fgStats = pd.read_csv(r'C:\Users\wilgu\Desktop\Blog\Season of Champions\Python\csvs\fgStats.csv')
+
+htmlSpace(passStats)
+htmlSpace(rushStats)
+htmlSpace(recStats)
+htmlSpace(defStats)
+htmlSpace(fgStats)
+
+passStats.to_csv(r'C:\Users\wilgu\Desktop\Blog\Season of Champions\Python\csvs\passStats.csv')
+rushStats.to_csv(r'C:\Users\wilgu\Desktop\Blog\Season of Champions\Python\csvs\rushStats.csv')
+recStats.to_csv(r'C:\Users\wilgu\Desktop\Blog\Season of Champions\Python\csvs\recStats.csv')
+defStats.to_csv(r'C:\Users\wilgu\Desktop\Blog\Season of Champions\Python\csvs\defStats.csv')
+fgStats.to_csv(r'C:\Users\wilgu\Desktop\Blog\Season of Champions\Python\csvs\fgStats.csv')
+
 
 ps = passStats.groupby('Name').sum()
 ps = ps.drop(columns=['Week','Rating'])
 ps['Rating'] = passerRating(ps['Yds'], ps['TD'], ps['Comp'], ps['Att'], ps['INT'])
+ps = ps.reset_index()
 
 
 rus = rushStats.groupby('Name').sum()
 rus = rus.drop(columns=['Week'])
-
+rus = rus.reset_index()
 
 res = recStats.groupby('Name').sum()
 res = res.drop(columns=['Week'])
-
+res = res.reset_index()
 
 ds = defStats.groupby('Name').sum()
 ds = ds.drop(columns=['Week'])
-
+ds = ds.reset_index()
 
 
 #Creates count columns for field goals by range
@@ -165,18 +182,26 @@ fgStats['Made'] = madeMiss(fgStats['<19 Made'], fgStats['20-29 Made'], fgStats['
 fgStats['Atts'] = madeMiss(fgStats['<19 Atts'], fgStats['20-29 Atts'], fgStats['30-39 Atts'], fgStats['40-49 Atts'], fgStats['50+ Atts'])
 fgStats['FG%'] = round(fgStats['Made']/fgStats['Atts']*100.00,2)
 
+cols = list(fgStats)
+cols.insert(1, cols.pop(cols.index('Team')))
+cols.insert(2, cols.pop(cols.index('Made')))
+cols.insert(3, cols.pop(cols.index('Atts')))
+cols.insert(4, cols.pop(cols.index('FG%')))
+cols.insert(5, cols.pop(cols.index('Long')))
 
+fgStats = fgStats.ix[:, cols]
+
+fgStats.to_csv(r'C:\users\wilgu\desktop\blog\season of champions\python\csvs\fgStats.csv')
 
 fgs = fgStats.groupby('Name').sum()
 
 
-
 #Passing Season Stat Table Transformations
-pas['Team'] = pas['Name'].map(lambda x: findTeam(passStats, x))
-cols = list(pas)
+ps['Team'] = ps['Name'].map(lambda x: findTeam(passStats, x))
+cols = list(ps)
 cols.insert(1, cols.pop(cols.index('Team')))
 
-pas = pas.ix[:, cols]
+ps = ps.ix[:, cols]
 
 #Rushing Season Stat Table Transformations
 rus['Team'] = rus['Name'].map(lambda x: findTeam(rushStats, x))
@@ -201,9 +226,11 @@ ds = ds.ix[:, cols]
 
 #FG Season Stat Table Transformations
 fgs = fgs.drop(columns=['Week','Long','FG%'])
+fgs = fgs.reset_index()
 
-fgs['Long'] = fgStats['Name'].map(lambda x: fgLong(x))
+fgs['Long'] = fgStats['Name'].map(lambda x: fgSeaLong(x))
 fgs['Team'] = fgs['Name'].map(lambda x: findTeam(fgStats, x))
+fgs['FG%'] = round(100.00*fgs['Made']/fgs['Atts'],2)
 
 cols = list(fgs)
 cols.insert(1, cols.pop(cols.index('Team')))
@@ -216,8 +243,8 @@ fgs = fgs.ix[:, cols]
 
 
 #Saves to CSVs)
-ps.to_csv(r'C:\users\wilgj\desktop\python crap\csvs\passSeason.csv')
-rus.to_csv(r'C:\users\wilgj\desktop\python crap\csvs\rushSeason.csv')
-res.to_csv(r'C:\users\wilgj\desktop\python crap\csvs\recSeason.csv')
-ds.to_csv(r'C:\users\wilgj\desktop\python crap\csvs\defSeason.csv')
-fgs.to_csv(r'C:\users\wilgj\desktop\python crap\csvs\fgSeason.csv')
+ps.to_csv(r'C:\Users\wilgu\Desktop\Blog\Season of Champions\Python\csvs\tpassSeason.csv')
+rus.to_csv(r'C:\Users\wilgu\Desktop\Blog\Season of Champions\Python\csvs\rushSeason.csv')
+res.to_csv(r'C:\Users\wilgu\Desktop\Blog\Season of Champions\Python\csvs\recSeason.csv')
+ds.to_csv(r'C:\Users\wilgu\Desktop\Blog\Season of Champions\Python\csvs\defSeason.csv')
+fgs.to_csv(r'C:\Users\wilgu\Desktop\Blog\Season of Champions\Python\csvs\fgSeason.csv')
