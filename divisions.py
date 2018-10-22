@@ -49,7 +49,7 @@ teamDiv = {
  'Kent State Golden Flashes': 'East',
  'Kentucky Wildcats': 'East',
  'LSU Tigers': 'West',
- 'Louisiana Tech Bulldogs': '',
+ 'Louisiana Tech Bulldogs': 'West',
  "Louisiana-Lafayette Ragin' Cajuns": 'West',
  'Louisiana-Monroe Warhawks': 'West',
  'Louisville Cardinals': 'Atlantic',
