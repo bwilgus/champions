@@ -110,6 +110,7 @@ SBC = SBC.sort_values(by='Conf Wins',ascending=False)
 SBC = SBC.reset_index(drop=True)
 
 IND = IND.sort_values(by='Wins',ascending=False)
+IND = IND.drop(columns=['Conf Wins', 'Conf Losses'])
 IND = IND.reset_index(drop=True)
 
 
