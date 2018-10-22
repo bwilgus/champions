@@ -1,60 +1,125 @@
 import pandas as pd
+from teamCon import teamCon
 
-def tmWin(tm):
-    return(len(wsData[(wsData.Win == tm)]))
+
+def tmWin(tm, i, wk):
+    return(len(wsData[(wsData.Win == tm) & (wsData.Week <= int(wk))]))
             
-def tmLoss(tm):
-    return(len(wsData[(wsData.Loss == tm)]))
+def tmLoss(tm, i, wk):
+    return(len(wsData[(wsData.Loss == tm) & (wsData.Week <= int(wk))]))
 
-
-def conWin(tm):
-    return(len(wsData[(wsData.Win == tm) & (wsData['Conference Game?'] == True)]))
+def conWin(tm, i, wk):
+    return(len(wsData[(wsData.Win == tm) & (wsData['Conference Game?'] == True) & (wsData.Week <= int(wk))]))
             
-def conLoss(tm):
-    return(len(wsData[(wsData.Loss == tm) & (wsData['Conference Game?'] == True)]))
+def conLoss(tm, i, wk):
+    return(len(wsData[(wsData.Loss == tm) & (wsData['Conference Game?'] == True) & (wsData.Week <= int(wk))]))
+
+def schedule(tm):
+    global sched
+    
+    sched = wsData[(wsData.Home == tm) | (wsData.Away == tm)]
+    sched.sort_values('Week')
+    sched.reset_index()
+
+    sched = sched.drop(columns=['Home ID', 'Home Conf', 'Away ID', 'Away Conf', "Home Conc", "Away Conc", "Date","Pre-Game Hype Score", "Upset Score", "Margin", "Write About", '2017?'])
+    
+    return(sched)
 
 
-wsData = pd.read_excel(r'C:\users\wilgu\desktop\blog\season of champions\python\dataOutputFinal.xlsx', sheet_name='data')
-WL = pd.read_excel(r'C:\users\wilgu\desktop\blog\season of champions\python\dataOutputFinal.xlsx', sheet_name='WL')
+wsData = pd.read_excel(r'C:\users\wilgj\desktop\python crap\dataOutput.xlsx', sheet_name='data')
+WL = pd.read_excel(r'C:\users\wilgj\desktop\python crap\dataOutput.xlsx', sheet_name='WL')
+
+wkMin = min(wsData.Week)
+wkMax = max(wsData.Week)
+
+userWk = input("Through which week? Min = " + str(wkMin) + ", Max = " + str(wkMax) + ". For pre-season, enter -1. ")
+##print(userWk)
 
 ACC = WL[WL.Conference == 'ACC']
-ACC = ACC.reset_index()
+ACC = ACC.reset_index(drop=True)
 
-B10 = WL[WL.Conference == 'Big 10']
-B10 = B10.reset_index()
+B10 = WL[WL.Conference == 'Big Ten']
+B10 = B10.reset_index(drop=True)
 
 B12 = WL[WL.Conference == 'Big 12']
-B12 = B12.reset_index()
+B12 = B12.reset_index(drop=True)
 
 P12 = WL[WL.Conference == 'Pac-12']
-P12 = P12.reset_index()
+P12 = P12.reset_index(drop=True)
 
 SEC = WL[WL.Conference == 'SEC']
-SEC = SEC.reset_index()
+SEC = SEC.reset_index(drop=True)
 
-AAC = WL[WL.Conference == 'AAC']
-AAC = AAC.reset_index()
+AAC = WL[WL.Conference == 'American']
+AAC = AAC.reset_index(drop=True)
 
-CUSA = WL[WL.Conference == 'CUSA']
-CUSA = CUSA.reset_index()
+CUSA = WL[WL.Conference == 'C-USA']
+CUSA = CUSA.reset_index(drop=True)
 
 MAC = WL[WL.Conference == 'MAC']
-MAC = MAC.reset_index()
+MAC = MAC.reset_index(drop=True)
 
 MWC = WL[WL.Conference == 'Mountain West']
-MWC = MWC.reset_index()
+MWC = MWC.reset_index(drop=True)
 
 SBC = WL[WL.Conference == 'Sun Belt']
-SBC = SBC.reset_index()
+SBC = SBC.reset_index(drop=True)
 
-cons = [AAC, ACC, B10, B12, CUSA, MAC, MWC, P12, SBC, SEC]
+IND = WL[WL.Conference == 'Independent']
+IND = IND.reset_index(drop=True)
 
-for i in range(len(cons)):
-    cons[i]['Wins'] = cons[i]['Team'].map(lambda x: tmWin(x))
-    cons[i]['Losses'] = cons[i]['Team'].map(lambda x: tmLoss(x))
-
+cons = [AAC, ACC, B10, B12, CUSA, IND, MAC, MWC, P12, SBC, SEC]
 
 for i in range(len(cons)):
-    cons[i]['Conf Wins'] = cons[i]['Team'].map(lambda x: conWin(x))
-    cons[i]['Conf Losses'] = cons[i]['Team'].map(lambda x: conLoss(x))
+    cons[i]['Wins'] = cons[i]['Name'].map(lambda x: tmWin(x, i, userWk))
+    cons[i]['Losses'] = cons[i]['Name'].map(lambda x: tmLoss(x, i, userWk))
 
+
+for i in range(len(cons)):
+    cons[i]['Conf Wins'] = cons[i]['Name'].map(lambda x: conWin(x, i, userWk))
+    cons[i]['Conf Losses'] = cons[i]['Name'].map(lambda x: conLoss(x, i, userWk))
+
+ACC = ACC.sort_values(by='Conf Wins',ascending=False)
+ACC = ACC.reset_index(drop=True)
+
+B10 = B10.sort_values(by='Conf Wins',ascending=False)
+B10 = B10.reset_index(drop=True)
+
+B12 = B12.sort_values(by='Conf Wins',ascending=False)
+B12 = B12.reset_index(drop=True)
+
+P12 = P12.sort_values(by='Conf Wins',ascending=False)
+P12 = P12.reset_index(drop=True)
+
+SEC = SEC.sort_values(by='Conf Wins',ascending=False)
+SEC = SEC.reset_index(drop=True)
+
+AAC = AAC.sort_values(by='Conf Wins',ascending=False)
+AAC = AAC.reset_index(drop=True)
+
+CUSA = CUSA.sort_values(by='Conf Wins',ascending=False)
+CUSA = CUSA.reset_index(drop=True)
+
+MAC = MAC.sort_values(by='Conf Wins',ascending=False)
+MAC = MAC.reset_index(drop=True)
+
+MWC = MWC.sort_values(by='Conf Wins',ascending=False)
+MWC = MWC.reset_index(drop=True)
+
+SBC = SBC.sort_values(by='Conf Wins',ascending=False)
+SBC = SBC.reset_index(drop=True)
+
+IND = IND.sort_values(by='Wins',ascending=False)
+IND = IND.reset_index(drop=True)
+
+
+
+#This needs to be after any standings modifications. It saves the conferences as a snapshot.
+cons = [AAC, ACC, B10, B12, CUSA, IND, MAC, MWC, P12, SBC, SEC]
+
+
+for i in range(len(cons)):
+    print(cons[i].to_string())
+    print('.')
+    print('.')
+    print('.')
