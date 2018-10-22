@@ -1,36 +1,199 @@
-ACC
-Two Teams:
-H2H
+##ACC
+##Two Teams:
+##H2H
 
-Three Teams:
-Combined H2H between the tied teams
-In-division win percentage
+##Three Teams:
+##Once tie has been reduced to 2 teams, 2-team applies
+
+##1) Combined H2H between the tied teams
+##2) In-division win percentage
+##3) Head to head record with next best team (conference record) not involved in the tie
+####a) So if three teams are tied for #1, whoever is in 4th would be the team compared against
+####b) if there was a tie for 4th it would be the record against all teams tied for fourth.
+##4) Combined win percentage versus all common non-divisional opponents
+##5) Overall win percentage versus non-divisional opponents
+##6) Win percentage versus common non-divisional opponents based upon their order of finish (starting with top, proceeding to bottom)
+##7) Team w/ highest ranking by Team Rating Score provided by SportSource Analytics
+##8) Random
+
+#########################################################################################################
+
+##Big 10
+##Two Teams:
+##H2H
+
+##Three Teams: 
+##If three or more teams are tied, steps 1 through 8 will be followed until a determination is made.  
+##Once tie has been reduced to 2 teams, 2-team applies
+
+##1) Combined H2H between the tied teams
+##2) In-division win percentage
+##3) Head to head record with next best team (conference record) not involved in the tie
+####a) So if three teams are tied for #1, whoever is in 4th would be the team compared against
+####b) if there was a tie for 4th it would be the record against all teams tied for fourth.
+##4) Head-to-head records against common conference opponents
+##5) Combined win percentage versus all common non-divisional opponents
+##6) Head to head record with next best team (conference record) not involved in the tie
+####a) So if three teams are tied for #1, whoever is in 4th would be the team compared against
+####b) if there was a tie for 4th it would be the record against all teams tied for fourth.
+##7) Overall Win Percentage
+##8) Random
 
 
-Big 10
+
+###################################################################
+
+##Big 12
+##Two Teams:
+##H2H
+
+##Three Teams: 
+##Once tie has been reduced to 2 teams, 2-team applies
+##If three or more teams are tied, steps 1 through 4 will be followed until a determination is made.  
+##If only two teams remain tied after any step, the winner of the regular season game between the two tied teams shall prevail.
+##1) Combined H2H between the tied teams
+##2) Head to head record with next best team (conference record) not involved in the tie
+####a) So if three teams are tied for #1, whoever is in 4th would be the team compared against
+####b) if there was a tie for 4th, the cluster of teams will be tie-broken before comparison.
+##3) Scoring differential
+##4) Random
 
 
-Big 12
+###################################################################
+
+##Pac 12
+##Two Teams:
+##H2H
+
+##Three Teams:
+##Once tie has been reduced to 2 teams, 2-team applies
+##1) H2H
+##2) In-division win percentage
+##3) Head to head record with next best team (conference record) not involved in the tie
+####a) So if three teams are tied for #1, whoever is in 4th would be the team compared against
+####b) if there was a tie for 4th, the cluster of teams will be tie-broken before comparison.
+##4) Record in common conference games
+##5) Highest rank in SportSource Analytics poll
+##6) Random
+
+##Championship Game Location Tiebreaker
+##1) H2H
+##2) Record against the next highest placed common opponent in the conference, proceed through conference
+##3) Record in common conference games
+##4) Highest rank in SportSource Analytics poll
+##5) Random
+###################################################################
+
+##SEC
+##Two Teams:
+##H2H
+
+##Three Teams:
+##1) H2H
+##2) Overall Record
+##3) Head to head record with next best team (conference record) not involved in the tie
+####a) So if three teams are tied for #1, whoever is in 4th would be the team compared against
+####b) if there was a tie for 4th, the cluster of teams will be tie-broken before comparison.
+##4) Complete record v. non-division teams
+##5) Complete record v. common non-division teams
+##6) Record v. common non-divisional team w/ the best overall Conference record, proceeding through
+##7) Best cumulative conf win percentage of non-divisional opponents
+##8) Random
+
+###################################################################
+
+##AAC
+##Two Teams:
+##H2H
+
+##Three Teams: 
+##Once tie has been reduced to 2 teams, 2-team applies
+##1) H2H
+##2) In division record
+##3) Record against next highest placed team in division, based on all conf games
+##4) Record against next highest placed team in division, based on in-division
+##5) Record against non-divisional opponents
+##6) Best win percentage in all games
+##7) Highest CFP ranking
+##8) Coin toss
+
+##Champ game location
+##1) Best conf record
+##2) H2H
+##3) CFP ranking
+##4) Common opponents
+##5) Overall record
+##6) Random
+
+###################################################################
+
+##CUSA
+##Two Teams:
+##H2H
+
+##Three teams: 
+##Once tie has been reduced to 2 teams, 2-team applies
+##1) H2H
+##2) Divisional W%
+##3) Records against divisional opponents, descending in order of finish
+##4) Compare records with common cross-divisional opponents
+##5) Compare h2h records w/ common cross-divisional opponents, starting at the top
+##6) Highest CFP rank
+##7) Random
 
 
-Pac 12
+###################################################################
+
+##MAC
+##Two Teams:
+##H2H
+
+##Three:
+##1) H2H
+##2) Record of tied teams within division
+##3) Conference win percentage of cross-division opponents
+##4) Random
 
 
-SEC
+###################################################################
 
+##MWC
+##Two Teams:
+##H2H
 
-AAC
+##Three:
+##1) H2H
+##2) Intradivision
+##3) Win percent v. common opponents
+##4) CFP
+##5) Overall win percentage against FBS opponents
+##6) Random
 
+##Champ game location
+##1) CFP 
+##2) Win percentage amongst common conf opponents
+##3) Head to head record with next best team (conference record) not involved in the tie
+####a) So if three teams are tied for #1, whoever is in 4th would be the team compared against
+####b) if there was a tie for 4th, the cluster of teams will be tie-broken before comparison.
 
-CUSA
+###################################################################
 
+##Sun Belt
+##Two Teams:
+##H2H
 
-MAC
+##Three: 
+##1) 
 
-
-MWC
-
-
-Sun Belt
+##Champ Games Location
+##1) H2H
+##2) intra-division
+##3) Head to head record with next best team (conference record) not involved in the tie
+####a) So if three teams are tied for #1, whoever is in 4th would be the team compared against
+####b) if there was a tie for 4th, the cluster of teams will be tie-broken before comparison.
+##4) CFP rank + win last game of the season
+##5) Strength of Schedule
+##6) highest overall win percentage
+##7) Random
 
 
