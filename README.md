@@ -1,6 +1,10 @@
 To-Do List: 
 - Make season stat csvs for each grouping
+- Standings tiebreakers
 - use findTeam() to add team names to Season Stat csvs
+- Championship games
+- - Neutral: ACC, B10, B12, SEC, MAC
+- - Home games: P12, MWC, SBC, CUSA, AAC
 
 Wishlist:
 
