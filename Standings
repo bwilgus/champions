@@ -1,18 +1,37 @@
 import pandas as pd
+import numpy as np
 from teamCon import teamCon
-
+from divisions import teamDiv
+import random
+import pprint
 
 def tmWin(tm, i, wk):
-    return(len(wsData[(wsData.Win == tm) & (wsData.Week <= int(wk))]))
+    return(len(wsData[(wsData.Win == tm) & (wsData.Week <= float(wk))]))
             
 def tmLoss(tm, i, wk):
-    return(len(wsData[(wsData.Loss == tm) & (wsData.Week <= int(wk))]))
+    return(len(wsData[(wsData.Loss == tm) & (wsData.Week <= float(wk))]))
 
 def conWin(tm, i, wk):
-    return(len(wsData[(wsData.Win == tm) & (wsData['Conference Game?'] == True) & (wsData.Week <= int(wk))]))
+    return(len(wsData[(wsData.Win == tm) & (wsData['Conference Game?'] == True) & (wsData.Week <= float(wk))]))
             
 def conLoss(tm, i, wk):
-    return(len(wsData[(wsData.Loss == tm) & (wsData['Conference Game?'] == True) & (wsData.Week <= int(wk))]))
+    return(len(wsData[(wsData.Loss == tm) & (wsData['Conference Game?'] == True) & (wsData.Week <= float(wk))]))
+
+def teamID(tm):
+    return(str(idDic[tm]).zfill(3))
+
+def conf(tm):
+    return(teamCon[tm])
+
+def div(tm):
+    try:
+        div = teamDiv[tm]
+    except:
+        div = '---'
+    return(div)
+
+def winPercent(w,l):
+    return round(w/(w+l) * 100,4)
 
 def schedule(tm):
     global sched
@@ -23,61 +42,80 @@ def schedule(tm):
 
     sched = sched.drop(columns=['Home ID', 'Home Conf', 'Away ID', 'Away Conf', "Home Conc", "Away Conc", "Date","Pre-Game Hype Score", "Upset Score", "Margin", "Write About", '2017?'])
     
-    return(sched)
+    return(print(sched.to_string()))
+
+def coinToss(teamList):
+    ints = len(teamList)
+    toss = random.randint(0, ints - 1)
+    return teamList[toss]
+
+
 
 
 wsData = pd.read_excel(r'C:\users\wilgj\desktop\python crap\dataOutput.xlsx', sheet_name='data')
 WL = pd.read_excel(r'C:\users\wilgj\desktop\python crap\dataOutput.xlsx', sheet_name='WL')
 
+teams = wsData.Home.drop_duplicates().sort_values()
+teams = teams.reset_index(drop=True)
+teams = teams.to_frame(name='Team')
+
+teams['ID'] = teams['Team'].map(lambda x: teamID(x))
+teams['Conference'] = teams['Team'].map(lambda x: conf(x))
+teams['Div'] = teams['Team'].map(lambda x: div(x))
+
 wkMin = min(wsData.Week)
 wkMax = max(wsData.Week)
 
-userWk = input("Through which week? Min = " + str(wkMin) + ", Max = " + str(wkMax) + ". For pre-season, enter -1. ")
+userWk = input("Through which week? Min = " + str(wkMin) + ", Max = " + str(wkMax + 1) + ". For pre-season, enter -1. ")
 ##print(userWk)
 
-ACC = WL[WL.Conference == 'ACC']
+ACC = teams[teams.Conference == 'ACC']
 ACC = ACC.reset_index(drop=True)
 
-B10 = WL[WL.Conference == 'Big Ten']
+B10 = teams[teams.Conference == 'Big Ten']
 B10 = B10.reset_index(drop=True)
 
-B12 = WL[WL.Conference == 'Big 12']
+B12 = teams[teams.Conference == 'Big 12']
 B12 = B12.reset_index(drop=True)
 
-P12 = WL[WL.Conference == 'Pac-12']
+P12 = teams[teams.Conference == 'Pac-12']
 P12 = P12.reset_index(drop=True)
 
-SEC = WL[WL.Conference == 'SEC']
+SEC = teams[teams.Conference == 'SEC']
 SEC = SEC.reset_index(drop=True)
 
-AAC = WL[WL.Conference == 'American']
+AAC = teams[teams.Conference == 'American']
 AAC = AAC.reset_index(drop=True)
 
-CUSA = WL[WL.Conference == 'C-USA']
+CUSA = teams[teams.Conference == 'C-USA']
 CUSA = CUSA.reset_index(drop=True)
 
-MAC = WL[WL.Conference == 'MAC']
+MAC = teams[teams.Conference == 'MAC']
 MAC = MAC.reset_index(drop=True)
 
-MWC = WL[WL.Conference == 'Mountain West']
+MWC = teams[teams.Conference == 'Mountain West']
 MWC = MWC.reset_index(drop=True)
 
-SBC = WL[WL.Conference == 'Sun Belt']
+SBC = teams[teams.Conference == 'Sun Belt']
 SBC = SBC.reset_index(drop=True)
 
-IND = WL[WL.Conference == 'Independent']
+IND = teams[teams.Conference == 'Independent']
 IND = IND.reset_index(drop=True)
 
 cons = [AAC, ACC, B10, B12, CUSA, IND, MAC, MWC, P12, SBC, SEC]
 
 for i in range(len(cons)):
-    cons[i]['Wins'] = cons[i]['Name'].map(lambda x: tmWin(x, i, userWk))
-    cons[i]['Losses'] = cons[i]['Name'].map(lambda x: tmLoss(x, i, userWk))
+    cons[i]['Wins'] = cons[i]['Team'].map(lambda x: tmWin(x, i, userWk))
+    cons[i]['Losses'] = cons[i]['Team'].map(lambda x: tmLoss(x, i, userWk))
+    cons[i]['W%'] = np.vectorize(winPercent)(cons[i]['Wins'], cons[i]['Losses'])
 
 
 for i in range(len(cons)):
-    cons[i]['Conf Wins'] = cons[i]['Name'].map(lambda x: conWin(x, i, userWk))
-    cons[i]['Conf Losses'] = cons[i]['Name'].map(lambda x: conLoss(x, i, userWk))
+    cons[i]['Conf Wins'] = cons[i]['Team'].map(lambda x: conWin(x, i, userWk))
+    cons[i]['Conf Losses'] = cons[i]['Team'].map(lambda x: conLoss(x, i, userWk))
+    try: cons[i]['Conf W%'] = np.vectorize(winPercent)(cons[i]['Conf Wins'], cons[i]['Conf Losses'])
+    except: pass
+
 
 ACC = ACC.sort_values(by='Conf Wins',ascending=False)
 ACC = ACC.reset_index(drop=True)
@@ -109,9 +147,22 @@ MWC = MWC.reset_index(drop=True)
 SBC = SBC.sort_values(by='Conf Wins',ascending=False)
 SBC = SBC.reset_index(drop=True)
 
-IND = IND.sort_values(by='Wins',ascending=False)
-IND = IND.drop(columns=['Conf Wins', 'Conf Losses'])
+##IND = IND.sort_values(by='Wins',ascending=False)
+##IND = IND.drop(columns=['Conf Wins', 'Conf Losses'])
 IND = IND.reset_index(drop=True)
+
+####Create Division Tables
+
+aacEast = AAC[AAC.Div == 'East']
+aacWest = AAC[AAC.Div == 'West']
+
+accAtl = ACC[ACC.Div == 'Atlantic']
+aacCoast = ACC[ACC.Div == 'Coastal']
+
+b10East = B10[B10.Div == 'East']
+b10West = B10[B10.Div == 'West']
+
+
 
 
 
