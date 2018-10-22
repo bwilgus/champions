@@ -162,9 +162,27 @@ aacCoast = ACC[ACC.Div == 'Coastal']
 b10East = B10[B10.Div == 'East']
 b10West = B10[B10.Div == 'West']
 
+p12North = P12[P12.Div == 'North']
+p12South = P12[P12.Div == 'South']
+
+secEast = SEC[B10.Div == 'East']
+secWest
 
 
+aacEast
+aacWest 
 
+cusaEast 
+cusaWest
+
+macEast 
+macWest 
+
+mwcMtn 
+mwcWest 
+
+sbEast 
+sbWest 
 
 #This needs to be after any standings modifications. It saves the conferences as a snapshot.
 cons = [AAC, ACC, B10, B12, CUSA, IND, MAC, MWC, P12, SBC, SEC]
