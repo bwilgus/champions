@@ -165,24 +165,23 @@ b10West = B10[B10.Div == 'West']
 p12North = P12[P12.Div == 'North']
 p12South = P12[P12.Div == 'South']
 
-secEast = SEC[B10.Div == 'East']
-secWest
+secEast = SEC[SEC.Div == 'East']
+secWest = SEC[SEC.Div == 'West']
 
+aacEast = AAC[AAC.Div == 'East']
+aacWest = AAC[AAC.Div == 'West']
 
-aacEast
-aacWest 
+cusaEast = CUSA[CUSA.Div == 'East']
+cusaWest = CUSA[CUSA.Div == 'West']
 
-cusaEast 
-cusaWest
+macEast = MAC[MAC.Div == 'East']
+macWest = MAC[MAC.Div == 'West'] 
 
-macEast 
-macWest 
+mwcMtn = MWC[MWC.Div == 'Mountain']
+mwcWest = MWC[MWC.Div == 'West']
 
-mwcMtn 
-mwcWest 
-
-sbEast 
-sbWest 
+sbEast = SBC[SBC.Div == 'East']
+sbWest = SBC[SBC.Div == 'West']
 
 #This needs to be after any standings modifications. It saves the conferences as a snapshot.
 cons = [AAC, ACC, B10, B12, CUSA, IND, MAC, MWC, P12, SBC, SEC]
