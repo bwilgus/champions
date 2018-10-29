@@ -6,56 +6,26 @@ import random
 import pprint
 from idDic import idDic
 from APR import aprDic
+from definitions import coinToss, conf, conWin, conLoss, div, divChamp, schedule, teamAPR, teamID, tieOvr, tmWin, tmLoss, winPercent
+import inspect
 
+##Links
+standingPath = r'C:\users\wilgj\desktop\python crap\standings\\'
+dataWB = r'C:\users\wilgj\desktop\python crap\dataOutput.xlsx'
+
+##Test dataframe
+tt = ['Mississippi Rebels','Mississippi State Bulldogs','Texas A&M Aggies','Kentucky Wildcats','Vanderbilt Commodores']
+tf = pd.DataFrame(data=tt,columns=['Teams'])
+##
+
+def retrieve_name(var):
+    callers_local_vars = inspect.currentframe().f_back.f_locals.items()
+    return [var_name for var_name, var_val in callers_local_vars if var_val is var]
+
+##Turns off chain dataframe warning
 pd.options.mode.chained_assignment = None
 
-def tmWin(tm, wk):
-    return(len(wsData[(wsData.Win == tm) & (wsData.Week <= float(wk))]))
-            
-def tmLoss(tm, wk):
-    return(len(wsData[(wsData.Loss == tm) & (wsData.Week <= float(wk))]))
 
-def conWin(tm, i, wk):
-    return(len(wsData[(wsData.Win == tm) & (wsData['Conference Game?'] == True) & (wsData.Week <= float(wk))]))
-            
-def conLoss(tm, i, wk):
-    return(len(wsData[(wsData.Loss == tm) & (wsData['Conference Game?'] == True) & (wsData.Week <= float(wk))]))
-
-def teamAPR(tm):
-    return(aprDic[tm])
-
-def teamID(tm):
-    return(str(idDic[tm]).zfill(3))
-
-def conf(tm):
-    return(teamCon[tm])
-
-def div(tm):
-    try:
-        div = teamDiv[tm]
-    except:
-        div = '---'
-    return(div)
-
-def winPercent(w,l):
-    return round(w/(w+l) * 100,2)
-
-def schedule(tm):
-    global sched
-    
-    sched = wsData[(wsData.Home == tm) | (wsData.Away == tm)]
-    sched.sort_values('Week')
-    sched.reset_index()
-
-    sched = sched.drop(columns=['Home ID', 'Home Conf', 'Away ID', 'Away Conf', "Home Conc", "Away Conc", "Date","Pre-Game Hype Score", "Upset Score", "Margin", "Write About", '2017?'])
-    
-    return(print(sched.to_string()))
-
-def divChamp(div):
-    return(div.Team[0])
-
-def tieOvr(tl):
-    ovrDF = teams[teams['Teams'].isin(tl)]
 
 def ties(df):
     global indexer
@@ -70,7 +40,6 @@ def ties(df):
     df.reset_index(drop=True,inplace=True)
     
     for i in range(len(df)):
-        print(df.Teams[i])
         if len(df[df['Conf W%'] == df['Conf W%'][i]]) == 1:
             indexer.append(df.Teams[i])
         elif len(df[df['Conf W%'] == df['Conf W%'][i]]) > 1:
@@ -86,20 +55,12 @@ def ties(df):
 
     df = df.reindex(reindexer)
 
-##    print('indexer')
-##    print(indexer)
-##    print('reindexer')
-##    print(reindexer)
+    for i 
+
     print(df.to_string())
+##    return(df)
 
-                
-        
-    
 
-##secWest.index[secWest['Team'] == 'LSU Tigers'][0]
-
-tt = ['Mississippi Rebels','Mississippi State Bulldogs','Texas A&M Aggies']
-tf = pd.DataFrame(data=tt,columns=['Teams'])
 def hth(df):
     
     if len(df) == 2:
@@ -129,6 +90,7 @@ def hth(df):
     elif len(df) > 2:
         df['Wins'] = np.nan
         df['Losses'] = np.nan
+        df['W%'] = np.nan
         for i in range(len(df)):
             wins = 0
             losses = 0
@@ -144,11 +106,21 @@ def hth(df):
 
             df.Wins[i] = wins
             df.Losses[i] = losses
-            df['W%'][i] = round(wins/(wins+losses)*100.00,2)
-
+            if wins + losses > 0:
+                df['W%'][i] = round(wins/(wins+losses)*100.00,2)
+            else:
+                df['W%'][i] = 0
         df.sort_values('W%',inplace=True, ascending=False)
 
     return(df)
+
+
+
+
+
+##def accTie(df):
+    
+
 
 ##def secTie(df):
 ##    newDF = df
@@ -173,20 +145,13 @@ def hth(df):
     ##H2H w/ next best team in division/conference
 
 
-    
-    
-
-def coinToss(teamList):
-    ints = len(teamList)
-    toss = random.randint(0, ints - 1)
-    return teamList[toss]
 
 
 
 
-wsData = pd.read_excel(r'C:\users\wilgj\desktop\python crap\dataOutput.xlsx', sheet_name='data')
+wsData = pd.read_excel(dataWB, sheet_name='data')
 wsData['Game ID'] = wsData['Game ID'].apply('{:0>6}'.format)
-WL = pd.read_excel(r'C:\users\wilgj\desktop\python crap\dataOutput.xlsx', sheet_name='WL')
+WL = pd.read_excel(dataWB, sheet_name='WL')
 
 teams = wsData.Home.drop_duplicates().sort_values()
 teams = teams.reset_index(drop=True)
@@ -350,9 +315,12 @@ bowlTeams57['APR'] = bowlTeams57['Teams'].map(lambda x: teamAPR(x))
 bowlTeams57.sort_values(by='APR', ascending=False,inplace=True)
 bowlTeams57.reset_index(drop=True, inplace=True)
 
-##for i in range(len(divs)):
-##    print(divs[i].to_string())
-##    print('.')
-##    print('.')
-##    print('.')
-
+#Sends HTML versions of the standings into txt files
+for i in range(len(divs)):
+    dName = retrieve_name(divs[i])
+    dName = dName[0]
+    docName = dName + '.txt'
+    sTxt = open(standingPath + docName, 'w')
+    sTxt.write(divs[i].to_html(index=False))
+    sTxt.close()
+    
