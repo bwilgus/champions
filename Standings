@@ -1,4 +1,3 @@
-
 import pandas as pd
 import numpy as np
 from teamCon import teamCon
@@ -16,143 +15,72 @@ standingPath = r'C:\users\wilgj\desktop\python crap\standings\\'
 dataWB = r'C:\users\wilgj\desktop\python crap\dataOutput.xlsx'
 
 ##Test dataframe
-tt = ['Kentucky Wildcats','Texas A&M Aggies','South Carolina Gamecocks','Vanderbilt Commodores','Mississippi State Bulldogs','Mississippi Rebels']
+tt = ['Kansas Jayhawks','Kansas State Wildcats','TCU Horned Frogs']
 tf = pd.DataFrame(data=tt,columns=['Teams'])
 ##
-
-def retrieve_name(var):
-    callers_local_vars = inspect.currentframe().f_back.f_locals.items()
-    return [var_name for var_name, var_val in callers_local_vars if var_val is var]
 
 ##Turns off chain dataframe warning
 pd.options.mode.chained_assignment = None
 
+##Background Functions
+def retrieve_name(var):
+    callers_local_vars = inspect.currentframe().f_back.f_locals.items()
+    return [var_name for var_name, var_val in callers_local_vars if var_val is var]
 
-def secTies(df):
-    global tieOrder
-    global tieVals
-    global tiedOut
-    global tied
-    global tieAdd
-
-    tieOrder = pd.DataFrame()
-    tied = pd.DataFrame()
-    tieVals = []
-    indexer = []
-    reindexer = []
-    tieAdd = []
-    ties = 1
-    matchup = []
+def find_index(df, column, find_term):
+    df = df[column][df.index[df[column] == find_term]]
+    return(df.index[0])
     
-
-    df.sort_values('Conf W%',ascending=False,inplace=True)
-    df.reset_index(drop=True,inplace=True)
-
-    tieVals = df['Conf W%'].drop_duplicates().reset_index(drop=True)
-
-    for i in range(len(tieVals)):
-        tV = df[df['Conf W%'] == tieVals[i]]
-        tV.reset_index(drop=True,inplace=True)
-        tieAdd.append(tV)
+def reindexer(df, indexer):
+    ri = []
     
-    for i in range(len(tieAdd)):
-        print(i)
-        if len(tieAdd[i]) > 1:
-            tiedOut, ties = rr(tieAdd[i])
-            print(tiedOut.to_string())
-            for x in range(len(tiedOut)):
-                df['Conf W%'][df.index[df['Teams'] == tiedOut['Teams'][x]][0]] += (round((len(tiedOut)-x)/10,2))
-        elif len(tieAdd[i]) == 1:
-            indexer.append(tieAdd[i]['Teams'][0])
-
-    print(df.to_string())
-    print('sys.exit()')
-    sys.exit()
-
-##    for i in range(len(tieVals)):
-##        if len(df[df['Conf W%'] == tieVals[i]]) == 1:
-##            tieAdd = df[df['Conf W%'] == tieVals[i]]
-##            tieAdd.reset_index(drop=True,inplace=True)
-##            indexer.append(tieAdd['Teams'][0])
-##        elif len(df[df['Conf W%'] == tieVals[i]]) > 1:
-####            tiedOut = tieBreaks(df, tieVals[i])
-##            tiedOut, ties = rr(df[df['Conf W%'] == tieVals[i]])
-##            print()
-##            print('ties: ' + str(ties))
-##            print('tiedOut:')
-##            print(tiedOut.to_string())
-##            print()
-##            print()
-
-    for x in range(len(tiedOut)):
-        indexer.append(tiedOut['Teams'][x])
-
     for i in range(len(indexer)):
-        reindexer.append(df.index[df['Teams'] == indexer[i]][0])
+        ri.append(df.index[df['Teams'] == indexer[i]][0])
 
-    df = df.reindex(reindexer)
-##    print(indexer)
-##    print(reindexer)
-    
+    df = df.reindex(ri)
+
     return(df)
-##    print(df.to_string())
-
-
-
-def tieBreaks(df, tieVals):
-    global ties
-    global tiedOut
-    global tieList
-    global to2
-    global indexer
-    global tied
-    to2 = []
-
-    indexer=[]
     
-    tieList = []
+def confSort(df):
+    df.sort_values('Conf W%',ascending=False,inplace=True)
+    df.reset_index(inplace=True,drop=True)
+
+    return(df)
+
+##########Conference Tiebreaker Background Functions###########################################
+
+##This one goes through, determines any ties, and breaks them up via head-to-head.
+
+##If h2h does not break certain ties, it passes back a dataframe with the teams in 
+##question marked under the 'Next Step' column
+
+def rr(df, u = 0):
     
-    ties = 1
-    while ties == 1:
-        tied = df[df['Conf W%'] == tieVals]
-        tied.reset_index(drop=True, inplace=True)
-        tiedOut, ties = rr(tied)
-        print('tieBreaks rr escaped')
-        print(ties)
-        if ties == 1:
-            for i in range(len(tiedOut)):
-                print("i: " + str(i))
-                if len(tiedOut[tiedOut['W%'] == tiedOut['W%'][i]]) > 1:
-                    to2 = tieBreaks(tiedOut[tiedOut['W%'] == tiedOut['W%'][i]], tiedOut['W%'][i])
-                    print('to2:')
-                    print(to2)
-                elif len(tiedOut[tiedOut['W%'] == tiedOut['W%'][i]]) == 1:
-                    indexer.append(tiedOut['Teams'][i])
-        else:
-            for i in range(len(tiedOut)):
-                indexer.append(tiedOut['Teams'][i])
+    ##Establish Variables
+    tieOrder = []
+    nextStep = 0
+    ns = 0
+    nsTeams = []
+    nsTeams.append(np.nan)
+    nst = []
 
-        
-    print('while loop escaped')
-    print(tiedOut)
-    print('tieBreaks')
-    print(indexer)
-    return(tiedOut)
-
-
-
-def rr(df):
+    ##Turn list or dataframe into appropriate dataframe
     if isinstance(df, list):
-        df = pd.DataFrame(df, columns=['Teams'])    
-    
+        df = pd.DataFrame(df, columns=['Teams'])
+    elif isinstance(df, pd.DataFrame):
+        df = pd.DataFrame(df['Teams'], columns=['Teams'])    
+
+    ##Establish new dataframe's columns
     df['Wins'] = np.nan
     df['Losses'] = np.nan
-    df['W%'] = np.nan
+    df['Conf W%'] = np.nan
+    df['Next Step'] = 0
 
     df.reset_index(drop=True,inplace=True)
 
     ties = 0
-    
+
+    ##Does head to head of each 
     for i in range(len(df)):
         wins = 0
         losses = 0
@@ -165,26 +93,78 @@ def rr(df):
                     wins += 1
                 elif game.Teams[1] == df.Teams[i]:
                     losses += 1
-
+        
         df.Wins[i] = wins
         df.Losses[i] = losses
         if wins + losses > 0:
-            df['W%'][i] = round(wins/(wins+losses)*100.00,2)
+            df['Conf W%'][i] = round(wins/(wins+losses)*100.00,2)
         else:
-            df['W%'][i] = 0
-    df.sort_values('W%',inplace=True, ascending=False)
-
-    for i in range(len(df)):
-        if len(df[df['W%'] == df['W%'][i]]) > 1:
-            ties = 1
+            df['Conf W%'][i] = 0
+    df.sort_values('Conf W%',inplace=True, ascending=False)
+    lenDF = df['Conf W%'].drop_duplicates()
+    lenDF.reset_index(inplace=True,drop=True)
+    for i in range(len(lenDF)):
+        if len(df[df['Conf W%'] == lenDF[i]]) > 1:
+            newDF = df[df['Conf W%'] == lenDF[i]]
+            newDF.reset_index(inplace=True,drop=True)
             
+            if len(newDF) == newDF['Wins'].sum() and len(newDF) > 2:
+                ns += 1
+                newDF['Next Step'] = ns
+                nsTeams.append(newDF)
+                nst = nsTeams
+            elif newDF['Wins'].sum() + newDF['Losses'].sum() == 0:
+                ns += 1
+                newDF['Next Step'] = ns
+                nsTeams.append(newDF)
+                nst = nsTeams
+            else:
+                newDF, to, ns, nst = rr(newDF,u+1)
+                newDF.reset_index(inplace=True,drop=True)
+                
+            for x in range(len(newDF)):
+                if len(newDF[newDF['Conf W%'] == newDF['Conf W%'][x]]) > 1:
+                    ties = 1
+                    
+            if ties == 0:
+                for x in range(len(newDF)):
+                    tieOrder.append(newDF['Teams'][x])
+            else:
+                if ns == 0:
+                    newDF, to, ns, nst = rr(newDF,u+1)
+                    newDF.reset_index(inplace=True,drop=True)
+                    for x in range(len(to)):
+                        tieOrder.append(to[x])
+                elif ns > 0:
+                    for x in range(len(newDF)):
+                        tieOrder.append(newDF.Teams[x])
+                    
+        else:
+            tf = df[df['Conf W%'] == lenDF[i]].reset_index(drop=True)
+            tieOrder.append(tf['Teams'][0])
+
+
+    df = reindexer(df, tieOrder)
     df.reset_index(drop=True,inplace=True)
+    if u == 0:
+        for i in range(len(nst)):
+            if i == 0:
+                pass
+            else:
+                for x in range(len(nst[i]['Teams'])):
+                    ndx = find_index(df,'Teams',nst[i]['Teams'][x])
+                    df['Next Step'][ndx] = i
     
-    return(df, ties)
+    return(df, tieOrder, nextStep, nst)
 
 
-
+##This function takes two teams and grabs the head-to-head record
 def hth(df):
+    if isinstance(df, list):
+        df = pd.DataFrame(df, columns=['Teams'])
+    elif isinstance(df, pd.DataFrame):
+        df = pd.DataFrame(df['Teams'], columns=['Teams']) 
+
     try:
         t1ID = idDic[df.Teams[0]]
     except:
@@ -210,7 +190,249 @@ def hth(df):
     df = pd.DataFrame(data=[hthW,hthL],columns=['Teams'])
     return(df)
 
+def inDiv(df):
+    ties = df['Next Step'].max()
+    ties += 1
+    tieNo = 0
+    teamOrder = []
+    tiedTeams = []
+    for i in range(len(df)):
+        if df['Next Step'][i] == 0:
+            teamOrder.append(df.Teams[i])
+        else:
+            if tieNo != df['Next Step'][i]:
+                tieNo = df['Next Step'][i]
+                tdf = df[df['Next Step'] == tieNo]
+                tdf = tdf['Teams']
+                tdf = pd.DataFrame(data=tdf,columns=['Teams'])
+##                tiedTeams.append(tdf)
+                ds,t1,t2,t3 = rr(df)
+                tdf['Div W%'] = tdf['Teams'].apply(lambda x: ds['Conf W%'][find_index(ds, 'Teams', x)])
+                
+                                                   
+##                for x in range(len(df)):
+##                    if df['Next Step'][x] == tieNo:
 
+    
+
+######################Conference Tiebreakers###########################################
+
+def accTies(df):
+
+    origDF = df
+    df = confSort(df)
+    
+    ##Check if divisional tie applies
+    dc = df['Div'].drop_duplicates()
+    
+    if dc[0] == '':
+        divBreak = False
+    elif len(dc) == 1:
+        divBreak = True
+    else:
+        divBreak = False
+    
+
+    
+    ##Head-To-Head
+    df, throwaway, throwaway2, ns = rr(df)
+
+    ##In-Division Win Percentage
+##    if divBreak:
+##        if df['Next Step'].sum() > 0:
+##            df = inDiv(df)
+
+
+
+    return(df)
+    
+
+
+
+
+
+def b10Ties(df):
+    origDF = df
+    df = confSort(df)
+
+    ##Check if divisional tie applies
+    dc = df['Div'].drop_duplicates()
+    if len(dc) == 1:
+        divBreak = True
+    else:
+        divBreak = False    
+
+    ##Head-To-Head
+    df, throwaway, throwaway2, ns = rr(df)
+
+    ##
+    
+
+
+
+    return(df)
+
+def b12Ties(df):
+    origDF = df
+    df = confSort(df)
+    
+    ##Head-To-Head
+    df, throwaway, throwaway2, ns = rr(df)
+
+    ##
+    
+
+
+
+    return(df)
+
+def p12Ties(df):
+    origDF = df
+    df = confSort(df)
+    
+    ##Check if divisional tie applies
+    dc = df['Div'].drop_duplicates()
+    if len(dc) == 1:
+        divBreak = True
+    else:
+        divBreak = False
+    
+    ##Head-To-Head
+    df, throwaway, throwaway2, ns = rr(df)
+
+    ##
+    
+
+
+    return(df)
+
+
+def secTies(df):
+    origDF = df
+    df = confSort(df)
+    
+    ##Check if divisional tie applies
+    dc = df['Div'].drop_duplicates()
+    if len(dc) == 1:
+        divBreak = True
+    else:
+        divBreak = False
+    
+    ##Head-To-Head
+    df, throwaway, throwaway2, ns = rr(df)
+
+    ##
+    
+
+    return(df)
+
+
+
+def aacTies(df):
+    origDF = df
+    df = confSort(df)
+    
+    ##Check if divisional tie applies
+    dc = df['Div'].drop_duplicates()
+    if len(dc) == 1:
+        divBreak = True
+    else:
+        divBreak = False
+    
+    ##Head-To-Head
+    df, throwaway, throwaway2, ns = rr(df)
+
+    ##
+    
+
+
+    return(df)
+
+
+def cusaTies(df):
+    origDF = df
+    df = confSort(df)
+    
+    ##Check if divisional tie applies
+    dc = df['Div'].drop_duplicates()
+    if len(dc) == 1:
+        divBreak = True
+    else:
+        divBreak = False
+    
+    ##Head-To-Head
+    df, throwaway, throwaway2, ns = rr(df)
+
+    ##
+    
+
+
+
+    return(df)
+
+def macTies(df):
+    origDF = df
+    df = confSort(df)
+    
+    ##Check if divisional tie applies
+    dc = df['Div'].drop_duplicates()
+    if len(dc) == 1:
+        divBreak = True
+    else:
+        divBreak = False
+    
+    ##Head-To-Head
+    df, throwaway, throwaway2, ns = rr(df)
+
+    ##
+    
+
+
+    return(df)
+
+
+def mwcTies(df):
+    origDF = df
+    df = confSort(df)
+    
+    ##Check if divisional tie applies
+    dc = df['Div'].drop_duplicates()
+    if len(dc) == 1:
+        divBreak = True
+    else:
+        divBreak = False
+    
+    ##Head-To-Head
+    df, throwaway, throwaway2, ns = rr(df)
+
+    ##
+    
+
+
+    return(df)
+
+
+def sbcTies(df):
+    origDF = df
+    df = confSort(df)
+    
+    ##Check if divisional tie applies
+    dc = df['Div'].drop_duplicates()
+    if len(dc) == 1:
+        divBreak = True
+    else:
+        divBreak = False
+    
+    ##Head-To-Head
+    df, throwaway, throwaway2, ns = rr(df)
+
+    ##
+    
+
+
+    return(df)
+
+######################################################################################
 
 
 
@@ -323,55 +545,61 @@ IND.reset_index(drop=True, inplace=True)
 
 aacEast = AAC[AAC.Div == 'East']
 aacEast = aacEast.reset_index(drop=True)
+
 aacWest = AAC[AAC.Div == 'West']
 aacWest = aacWest.reset_index(drop=True)
 
 accAtl = ACC[ACC.Div == 'Atlantic']
 accAtl = accAtl.reset_index(drop=True)
+
 accCoast = ACC[ACC.Div == 'Coastal']
 accCoast = accCoast.reset_index(drop=True)
 
 b10East = B10[B10.Div == 'East']
 b10East = b10East.reset_index(drop=True)
+
 b10West = B10[B10.Div == 'West']
 b10West = b10West.reset_index(drop=True)
 
 p12North = P12[P12.Div == 'North']
 p12North = p12North.reset_index(drop=True)
+
 p12South = P12[P12.Div == 'South']
 p12South = p12South.reset_index(drop=True)
 
 secEast = SEC[SEC.Div == 'East']
 secEast = secEast.reset_index(drop=True)
+
 secWest = SEC[SEC.Div == 'West']
 secWest = secWest.reset_index(drop=True)
 
 cusaEast = CUSA[CUSA.Div == 'East']
 cusaEast = cusaEast.reset_index(drop=True)
+
 cusaWest = CUSA[CUSA.Div == 'West']
 cusaWest = cusaWest.reset_index(drop=True)
 
 macEast = MAC[MAC.Div == 'East']
 macEast = macEast.reset_index(drop=True)
+
 macWest = MAC[MAC.Div == 'West']
 macWest = macWest.reset_index(drop=True)
 
-mwcMtn = MWC[MWC.Div == 'Mountain']
-mwcMtn = mwcMtn.reset_index(drop=True)
 mwcWest = MWC[MWC.Div == 'West']
 mwcWest = mwcWest.reset_index(drop=True)
 
+mwcMtn = MWC[MWC.Div == 'Mountain']
+mwcMtn = mwcMtn.reset_index(drop=True)
+
 sbEast = SBC[SBC.Div == 'East']
 sbEast = sbEast.reset_index(drop=True)
+
 sbWest = SBC[SBC.Div == 'West']
 sbWest = sbWest.reset_index(drop=True)
 
 
-
-#This needs to be after any standings modifications. It saves the conferences as a snapshot.
 cons = [AAC, ACC, B10, B12, CUSA, IND, MAC, MWC, P12, SBC, SEC]
 divs = [aacEast, aacWest, accAtl, accCoast, b10East, b10West, B12, IND, p12North, p12South, secEast, secWest, cusaEast, cusaWest, macEast, macWest, mwcMtn, mwcWest, sbEast, sbWest]
-
 
 bowlTeams = teams[teams.Wins >= 6]
 bowlTeams.reset_index(drop=True, inplace=True)
@@ -380,6 +608,9 @@ bowlTeams57.reset_index(drop=True, inplace=True)
 bowlTeams57['APR'] = bowlTeams57['Teams'].map(lambda x: teamAPR(x))
 bowlTeams57.sort_values(by='APR', ascending=False,inplace=True)
 bowlTeams57.reset_index(drop=True, inplace=True)
+
+
+
 
 #Sends HTML versions of the standings into txt files
 for i in range(len(divs)):
@@ -390,35 +621,75 @@ for i in range(len(divs)):
     sTxt.write(divs[i].to_html(index=False))
     sTxt.close()
     
-##def ties(df):
-##    global indexer
-##    global reindexer
-##    global tieOrder
-####Head to Head
-##    tieWins = []
-##    indexer = []
-##    reindexer = []
-##
-##    df.sort_values('Conf W%',ascending=False,inplace=True)
-##    df.reset_index(drop=True,inplace=True)
-##    
-##    for i in range(len(df)):
-##        if len(df[df['Conf W%'] == df['Conf W%'][i]]) == 1:
-##            indexer.append(df.Teams[i])
-##        elif len(df[df['Conf W%'] == df['Conf W%'][i]]) > 1:
-##            if df['Conf W%'][i] not in tieWins:
-##                tieWins.append(df['Conf W%'][i])
-##                tieTeams = df[df['Conf W%'] == df['Conf W%'][i]]
-##                tieTeams.reset_index(inplace=True)
-##                tieOrder = hth(tieTeams)
-##                for x in range(len(tieOrder)):
-##                    indexer.append(tieOrder.Teams[x])
-##    for i in range(len(indexer)):
-##        reindexer.append(df.index[df['Teams'] == indexer[i]][0])
-##
-##    df = df.reindex(reindexer)
-##
-####    for i 
-##
-##    print(df.to_string())
-####    return(df)
+
+
+aacEast = aacTies(aacEast)
+aacWest = aacTies(aacWest)
+
+accAtl = accTies(accAtl)
+accCoast = accTies(accCoast)
+
+b10East = b10Ties(b10East)
+b10West = b10Ties(b10West)
+
+B12 = b12Ties(B12)
+
+p12North = p12Ties(p12North)
+p12South = p12Ties(p12South)
+
+secEast = secTies(secEast)
+secWest = secTies(secWest)
+
+cusaEast = cusaTies(cusaEast)
+cusaWest = cusaTies(cusaWest)
+
+macEast = macTies(macEast)
+macWest = macTies(macWest)
+
+mwcMtn = mwcTies(mwcMtn)
+mwcWest = mwcTies(mwcWest)
+
+sbEast = sbcTies(sbEast)
+sbWest = sbcTies(sbWest)
+
+
+##Needs to be after any division DF manipulation
+aacEast.name = 'AAC East'
+aacWest.name = 'AAC West'
+accAtl.name = 'ACC Atlantic'
+accCoast.name = 'ACC Coastal'
+b10East.name = 'Big 10 East'
+b10West.name = 'Big 10 West'
+B12.name = 'Big 12'
+IND.name = 'Independent'
+p12North.name = 'Pac-12 North'
+p12South.name = 'Pac-12 South'
+secEast.name = 'SEC East'
+secWest.name = 'SEC West'
+cusaEast.name = 'C-USA East'
+cusaWest.name = 'C-USA West'
+macEast.name = 'MAC East'
+macWest.name = 'MAC West'
+mwcMtn.name = 'MWC Mountain'
+mwcWest.name = 'MWC West'
+sbEast.name = 'Sun Belt East'
+sbWest.name = 'Sun Belt West'
+
+
+
+
+
+
+#This needs to be after any standings modifications. It saves the conferences as a snapshot.
+cons = [AAC, ACC, B10, B12, CUSA, IND, MAC, MWC, P12, SBC, SEC]
+divs = [aacEast, aacWest, accAtl, accCoast, b10East, b10West, B12, IND, p12North, p12South, secEast, secWest, cusaEast, cusaWest, macEast, macWest, mwcMtn, mwcWest, sbEast, sbWest]
+
+for i in range(len(divs)):
+	print(i)
+	if divs[i].name == 'Big 12':
+		champs['Big 12 #1'] = divs[i]['Teams'][0]
+		champs['Big 12 #2'] = divs[i]['Teams'][1]
+	elif divs[i].name == 'Independent':
+		pass
+	else:
+		champs[divs[i].name] = divs[i]['Teams'][0]
