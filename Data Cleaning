@@ -3,16 +3,22 @@ import numpy as np
 from matplotlib import pyplot as plt
 import seaborn as sb
 
+filePath = r'C:\users\wilgj\desktop\python crap\csvs\\'
+
 ############################################################################
 
+
     ## My Functions
+
 
 def passerRating(pYds, pTD, pComp, pATT, pINT):
     rating = ((8.4*pYds)+(330*pTD)+(100*pComp)-(200*pINT))/pATT*1.0
     return(round(rating,2))
 
+
 def fg19(fgstring):
     m = 0
+
 
     if fgstring != '-':
         fNo = fgstring.count(',') + 1
@@ -23,11 +29,15 @@ def fg19(fgstring):
             if fg < 20:
                 m += 1
 
+
     return(m)
+
+
 
 
 def fg2029(fgstring):
     m = 0
+
 
     if fgstring != '-':
         fNo = fgstring.count(',') + 1
@@ -38,10 +48,13 @@ def fg2029(fgstring):
             if fg < 30 and fg >= 20:
                 m += 1
 
+
     return(m)
+
 
 def fg3039(fgstring):
     m = 0
+
 
     if fgstring != '-':
         fNo = fgstring.count(',') + 1
@@ -52,10 +65,13 @@ def fg3039(fgstring):
             if fg < 40 and fg >= 30:
                 m += 1
 
+
     return(m)
+
 
 def fg4049(fgstring):
     m = 0
+
 
     if fgstring != '-':
         fNo = fgstring.count(',') + 1
@@ -66,10 +82,13 @@ def fg4049(fgstring):
             if fg < 50 and fg >= 40:
                 m += 1
 
+
     return(m)
+
 
 def fg50(fgstring):
     m = 0
+
 
     if fgstring != '-':
         fNo = fgstring.count(',') + 1
@@ -80,10 +99,13 @@ def fg50(fgstring):
             if fg > 49:
                 m += 1
 
+
     return(m)
+
 
 def fgLong(fg):
     m = 0
+
 
     if fg != '-':
         fNo = fg.count(',') + 1
@@ -94,7 +116,10 @@ def fgLong(fg):
             if fgl > m:
                 m = fgl
 
+
     return(m)
+
+
 
 
 def returnIndex(series, value):
@@ -103,8 +128,10 @@ def returnIndex(series, value):
             return(i)
             break
 
+
 def madeMiss(colA, colB, colC, colD, colE):
     return(colA+colB+colC+colD+colE)
+
 
 def fgSeaLong(wkName):
     global fgl
@@ -118,16 +145,20 @@ def findTeam(sdf, wkName):
     tmn = tmn.reset_index()
     return(tmn.Team[0])
 
+
 def htmlSpace(pd):
     pd.replace(u'\xa0',u' ', regex=True, inplace=True)
 
+
 ############################################################################
 
-passStats = pd.read_csv(r'C:\Users\wilgu\Desktop\Blog\Season of Champions\Python\csvs\passStats.csv')
-rushStats = pd.read_csv(r'C:\Users\wilgu\Desktop\Blog\Season of Champions\Python\csvs\rushStats.csv')
-recStats = pd.read_csv(r'C:\Users\wilgu\Desktop\Blog\Season of Champions\Python\csvs\recStats.csv')
-defStats = pd.read_csv(r'C:\Users\wilgu\Desktop\Blog\Season of Champions\Python\csvs\defStats.csv')
-fgStats = pd.read_csv(r'C:\Users\wilgu\Desktop\Blog\Season of Champions\Python\csvs\fgStats.csv')
+
+passStats = pd.read_csv(filePath + r'passStats.csv')
+rushStats = pd.read_csv(filePath + r'rushStats.csv')
+recStats = pd.read_csv(filePath + r'recStats.csv')
+defStats = pd.read_csv(filePath + r'defStats.csv')
+fgStats = pd.read_csv(filePath + r'fgStats.csv')
+
 
 htmlSpace(passStats)
 htmlSpace(rushStats)
@@ -135,11 +166,14 @@ htmlSpace(recStats)
 htmlSpace(defStats)
 htmlSpace(fgStats)
 
-passStats.to_csv(r'C:\Users\wilgu\Desktop\Blog\Season of Champions\Python\csvs\passStats.csv')
-rushStats.to_csv(r'C:\Users\wilgu\Desktop\Blog\Season of Champions\Python\csvs\rushStats.csv')
-recStats.to_csv(r'C:\Users\wilgu\Desktop\Blog\Season of Champions\Python\csvs\recStats.csv')
-defStats.to_csv(r'C:\Users\wilgu\Desktop\Blog\Season of Champions\Python\csvs\defStats.csv')
-fgStats.to_csv(r'C:\Users\wilgu\Desktop\Blog\Season of Champions\Python\csvs\fgStats.csv')
+
+passStats.to_csv(filePath + r'passStats.csv', index=False)
+rushStats.to_csv(filePath + r'rushStats.csv', index=False)
+recStats.to_csv(filePath + r'recStats.csv', index=False)
+defStats.to_csv(filePath + r'defStats.csv', index=False)
+fgStats.to_csv(filePath + r'fgStats.csv', index=False)
+
+
 
 
 ps = passStats.groupby('Name').sum()
@@ -148,17 +182,23 @@ ps['Rating'] = passerRating(ps['Yds'], ps['TD'], ps['Comp'], ps['Att'], ps['INT'
 ps = ps.reset_index()
 
 
+
+
 rus = rushStats.groupby('Name').sum()
 rus = rus.drop(columns=['Week'])
 rus = rus.reset_index()
+
 
 res = recStats.groupby('Name').sum()
 res = res.drop(columns=['Week'])
 res = res.reset_index()
 
+
 ds = defStats.groupby('Name').sum()
 ds = ds.drop(columns=['Week'])
 ds = ds.reset_index()
+
+
 
 
 #Creates count columns for field goals by range
@@ -174,13 +214,16 @@ fgStats['50+ Made'] = fgStats['Made'].map(lambda x: fg50(x))
 fgStats['50+ Atts'] = fgStats['Missed'].map(lambda x: fg50(x)) + fgStats['Made'].map(lambda x: fg50(x))
 fgStats['Long'] = fgStats['Made'].map(lambda x: fgLong(x))
 
+
 #Removes the existing Made/Missed columns
 fgStats = fgStats.drop(columns=['Made','Missed'])
+
 
 #Creates Made, Attempts (Made + Missed), and FG%
 fgStats['Made'] = madeMiss(fgStats['<19 Made'], fgStats['20-29 Made'], fgStats['30-39 Made'], fgStats['40-49 Made'], fgStats['50+ Made'])
 fgStats['Atts'] = madeMiss(fgStats['<19 Atts'], fgStats['20-29 Atts'], fgStats['30-39 Atts'], fgStats['40-49 Atts'], fgStats['50+ Atts'])
 fgStats['FG%'] = round(fgStats['Made']/fgStats['Atts']*100.00,2)
+
 
 cols = list(fgStats)
 cols.insert(1, cols.pop(cols.index('Team')))
@@ -189,11 +232,16 @@ cols.insert(3, cols.pop(cols.index('Atts')))
 cols.insert(4, cols.pop(cols.index('FG%')))
 cols.insert(5, cols.pop(cols.index('Long')))
 
+
 fgStats = fgStats.ix[:, cols]
 
-fgStats.to_csv(r'C:\users\wilgu\desktop\blog\season of champions\python\csvs\fgStats.csv')
+
+fgStats.to_csv(filePath + r'fgStats.csv', index=False)
+
 
 fgs = fgStats.groupby('Name').sum()
+
+
 
 
 #Passing Season Stat Table Transformations
@@ -201,36 +249,46 @@ ps['Team'] = ps['Name'].map(lambda x: findTeam(passStats, x))
 cols = list(ps)
 cols.insert(1, cols.pop(cols.index('Team')))
 
+
 ps = ps.ix[:, cols]
+
 
 #Rushing Season Stat Table Transformations
 rus['Team'] = rus['Name'].map(lambda x: findTeam(rushStats, x))
 cols = list(rus)
 cols.insert(1, cols.pop(cols.index('Team')))
 
+
 rus = rus.ix[:, cols]
+
 
 #Receiving Season Stat Table Transformations
 res['Team'] = res['Name'].map(lambda x: findTeam(recStats, x))
 cols = list(res)
 cols.insert(1, cols.pop(cols.index('Team')))
 
+
 res = res.ix[:, cols]
+
 
 #Defensive Season Stat Table Transformations
 ds['Team'] = ds['Name'].map(lambda x: findTeam(defStats, x))
 cols = list(ds)
 cols.insert(1, cols.pop(cols.index('Team')))
 
+
 ds = ds.ix[:, cols]
+
 
 #FG Season Stat Table Transformations
 fgs = fgs.drop(columns=['Week','Long','FG%'])
 fgs = fgs.reset_index()
 
+
 fgs['Long'] = fgStats['Name'].map(lambda x: fgSeaLong(x))
 fgs['Team'] = fgs['Name'].map(lambda x: findTeam(fgStats, x))
 fgs['FG%'] = round(100.00*fgs['Made']/fgs['Atts'],2)
+
 
 cols = list(fgs)
 cols.insert(1, cols.pop(cols.index('Team')))
@@ -242,9 +300,13 @@ fgs = fgs.ix[:, cols]
 
 
 
+
+
+
 #Saves to CSVs)
-ps.to_csv(r'C:\Users\wilgu\Desktop\Blog\Season of Champions\Python\csvs\tpassSeason.csv')
-rus.to_csv(r'C:\Users\wilgu\Desktop\Blog\Season of Champions\Python\csvs\rushSeason.csv')
-res.to_csv(r'C:\Users\wilgu\Desktop\Blog\Season of Champions\Python\csvs\recSeason.csv')
-ds.to_csv(r'C:\Users\wilgu\Desktop\Blog\Season of Champions\Python\csvs\defSeason.csv')
-fgs.to_csv(r'C:\Users\wilgu\Desktop\Blog\Season of Champions\Python\csvs\fgSeason.csv')
+ps.to_csv(filePath + 'tpassSeason.csv', index=False)
+rus.to_csv(filePath + r'rushSeason.csv', index=False)
+res.to_csv(filePath + r'recSeason.csv', index=False)
+ds.to_csv(filePath + r'defSeason.csv', index=False)
+fgs.to_csv(filePath + r'fgSeason.csv', index=False)
+
