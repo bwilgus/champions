@@ -1,0 +1,17 @@
+{
+  "name": "champions",
+  "scripts": {
+  },
+  "env": {
+    "web": "gunicorn",
+    "app": "server"
+  },
+  "formation": {
+  },
+  "addons": [
+
+  ],
+  "buildpacks": [
+
+  ]
+}
