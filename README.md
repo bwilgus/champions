@@ -1,3 +1,6 @@
+PROOF OF CONCEPT, STAT TABLE: https://datastudio.google.com/u/0/reporting/1JXmm4VvWmhPLTDRJRDzrNl4E_wOxAYvd/page/CwNd
+
+
 Table of Contents: 
 
 'Data Cleaning.py' takes the raw data resulting from 'Game PDFs.py' and cleans it up. 
