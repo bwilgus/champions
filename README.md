@@ -50,3 +50,6 @@ Wishlist:
 - Parse the play-by-play to be able to attribute each play to a player and stat
 - Integrate Bill C's stat profiles?
 - Grab color codes for teams, integrate into matplotlib?
+
+Other Links:
+Google Form Generator: https://script.google.com/d/1mF_FvFUMMU7eUBjKRslrjJSlZo4vGmIglcVDZCMnsTwIVWeSisQM08Hy/edit
