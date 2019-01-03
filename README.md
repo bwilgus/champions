@@ -53,3 +53,7 @@ Wishlist:
 
 Other Links:
 Google Form Generator: https://script.google.com/d/1mF_FvFUMMU7eUBjKRslrjJSlZo4vGmIglcVDZCMnsTwIVWeSisQM08Hy/edit
+
+
+Special Thanks to:
+u/KingKliffsbury on Reddit for the AP Poll generator script
